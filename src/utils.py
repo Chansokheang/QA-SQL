@@ -25,7 +25,6 @@ claude_client = anthropic.Anthropic()
 llm = ChatGroq(
     model="Llama-3.3-70b-Versatile",
     temperature=0.7,
-    groq_api_key="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"
 )
 
 embedding_function = OpenAIEmbeddings(model="text-embedding-ada-002")

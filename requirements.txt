@@ -1,0 +1,34 @@
+# Core dependencies
+anthropic==0.49.0
+openai>=1.0.0
+langchain-core>=0.1.0
+langchain-community>=0.0.1
+langchain-chroma>=0.0.1
+langchain-openai>=0.0.1
+langchain-groq>=0.0.1
+chromadb==0.6.3
+chroma-hnswlib==0.7.6
+
+# Database-related
+sqlalchemy==2.0.38
+sqlite3-api>=0.1.0  # Pure Python interface for sqlite3
+
+# Utilities
+func-timeout==4.3.5
+numpy>=1.24.0
+
+# LLM-related
+pypika==0.48.9
+pydantic>=2.0.0
+coloredlogs>=15.0.1
+flatbuffers>=25.2.10
+fsspec>=2025.2.0
+filelock>=3.17.0
+backoff>=2.2.1
+
+# Evaluation
+multiprocessing>=0.70.15
+
+# Vector Database
+hnswlib>=0.7.0
+mmh3>=4.0.0
