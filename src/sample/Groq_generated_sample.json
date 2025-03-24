@@ -1,0 +1,2226 @@
+[
+    {
+        "question_id": 0,
+        "db_id": "financial",
+        "question": "What is the average amount of orders for each account?",
+        "evidence": "Average amount of orders = AVG(`amount`) GROUP BY `account_id`",
+        "SQL": "SELECT AVG(amount) FROM `order` GROUP BY account_id;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1,
+        "db_id": "financial",
+        "question": "How many accounts have a frequency of 'POPLATEK MESICNE'?",
+        "evidence": "Frequency = 'POPLATEK MESICNE'",
+        "SQL": "SELECT COUNT(account_id) FROM account WHERE frequency = 'POPLATEK MESICNE';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 2,
+        "db_id": "financial",
+        "question": "What is the total amount of money transferred from account 1?",
+        "evidence": "Transferred amount = SUM(`amount`) WHERE `account_id` = 1",
+        "SQL": "SELECT SUM(amount) FROM `order` WHERE account_id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 3,
+        "db_id": "financial",
+        "question": "What is the average balance of transactions for each account?",
+        "evidence": "Average balance = AVG(`balance`) GROUP BY `account_id`",
+        "SQL": "SELECT AVG(balance) FROM trans GROUP BY account_id;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 4,
+        "db_id": "financial",
+        "question": "How many clients are from district 1?",
+        "evidence": "District = 1",
+        "SQL": "SELECT COUNT(client_id) FROM client WHERE district_id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 5,
+        "db_id": "financial",
+        "question": "What is the maximum amount of loans for each account?",
+        "evidence": "Maximum amount of loans = MAX(`amount`) GROUP BY `account_id`",
+        "SQL": "SELECT MAX(amount) FROM loan GROUP BY account_id;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 6,
+        "db_id": "financial",
+        "question": "What is the total amount of payments for each loan?",
+        "evidence": "Total payments = SUM(`payments`) GROUP BY `loan_id`",
+        "SQL": "SELECT SUM(payments) FROM loan GROUP BY loan_id;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 7,
+        "db_id": "financial",
+        "question": "How many transactions are of type 'PRIJEM'?",
+        "evidence": "Type = 'PRIJEM'",
+        "SQL": "SELECT COUNT(trans_id) FROM trans WHERE type = 'PRIJEM';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 8,
+        "db_id": "financial",
+        "question": "What is the average amount of transactions for each account?",
+        "evidence": "Average amount = AVG(`amount`) GROUP BY `account_id`",
+        "SQL": "SELECT AVG(amount) FROM trans GROUP BY account_id;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 9,
+        "db_id": "financial",
+        "question": "What is the total amount of money transferred to account 2?",
+        "evidence": "Transferred amount = SUM(`amount`) WHERE `account_to` = 2",
+        "SQL": "SELECT SUM(amount) FROM `order` WHERE account_to = 2;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 10,
+        "db_id": "financial",
+        "question": "How many accounts have a district with 'Hl.m. Praha'?",
+        "evidence": "District = 'Hl.m. Praha'",
+        "SQL": "SELECT COUNT(account_id) FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A2 = 'Hl.m. Praha');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 11,
+        "db_id": "financial",
+        "question": "What is the average amount of loans for each district?",
+        "evidence": "Average amount of loans = AVG(`amount`) GROUP BY `district_id`",
+        "SQL": "SELECT AVG(amount) FROM loan WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district)) GROUP BY district_id;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 12,
+        "db_id": "financial",
+        "question": "What is the total amount of money transferred from district 1?",
+        "evidence": "Transferred amount = SUM(`amount`) WHERE `account_id` IN (SELECT `account_id` FROM account WHERE `district_id` = 1)",
+        "SQL": "SELECT SUM(amount) FROM `order` WHERE account_id IN (SELECT account_id FROM account WHERE district_id = 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 13,
+        "db_id": "financial",
+        "question": "How many clients are from district 'central Bohemia'?",
+        "evidence": "District = 'central Bohemia'",
+        "SQL": "SELECT COUNT(client_id) FROM client WHERE district_id IN (SELECT district_id FROM district WHERE A3 = 'central Bohemia');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 14,
+        "db_id": "financial",
+        "question": "What is the average balance of transactions for each district?",
+        "evidence": "Average balance = AVG(`balance`) GROUP BY `district_id`",
+        "SQL": "SELECT AVG(balance) FROM trans WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district)) GROUP BY district_id;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 15,
+        "db_id": "financial",
+        "question": "What is the total amount of payments for each district?",
+        "evidence": "Total payments = SUM(`payments`) GROUP BY `district_id`",
+        "SQL": "SELECT SUM(payments) FROM loan WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district)) GROUP BY district_id;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 16,
+        "db_id": "financial",
+        "question": "How many transactions are of type 'PRIJEM' for each account?",
+        "evidence": "Type = 'PRIJEM'",
+        "SQL": "SELECT COUNT(trans_id) FROM trans WHERE type = 'PRIJEM' GROUP BY account_id;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 17,
+        "db_id": "financial",
+        "question": "What is the average amount of orders for each district?",
+        "evidence": "Average amount of orders = AVG(`amount`) GROUP BY `district_id`",
+        "SQL": "SELECT AVG(amount) FROM `order` WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district)) GROUP BY district_id;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 18,
+        "db_id": "financial",
+        "question": "What is the total amount of money transferred to district 1?",
+        "evidence": "Transferred amount = SUM(`amount`) WHERE `account_to` IN (SELECT `account_id` FROM account WHERE `district_id` = 1)",
+        "SQL": "SELECT SUM(amount) FROM `order` WHERE account_to IN (SELECT account_id FROM account WHERE district_id = 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 19,
+        "db_id": "financial",
+        "question": "How many accounts have a frequency of 'POPLATEK MESICNE' in district 'Hl.m. Praha'?",
+        "evidence": "Frequency = 'POPLATEK MESICNE' AND District = 'Hl.m. Praha'",
+        "SQL": "SELECT COUNT(account_id) FROM account WHERE frequency = 'POPLATEK MESICNE' AND district_id IN (SELECT district_id FROM district WHERE A2 = 'Hl.m. Praha');",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 20,
+        "db_id": "financial",
+        "question": "What is the average amount of loans for each account in district 'central Bohemia'?",
+        "evidence": "Average amount of loans = AVG(`amount`) GROUP BY `account_id` WHERE `district_id` IN (SELECT `district_id` FROM district WHERE `A3` = 'central Bohemia')",
+        "SQL": "SELECT AVG(amount) FROM loan WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A3 = 'central Bohemia')) GROUP BY account_id;",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 21,
+        "db_id": "financial",
+        "question": "What is the total amount of money transferred from district 'Hl.m. Praha' to district 'central Bohemia'?",
+        "evidence": "Transferred amount = SUM(`amount`) WHERE `account_id` IN (SELECT `account_id` FROM account WHERE `district_id` IN (SELECT `district_id` FROM district WHERE `A2` = 'Hl.m. Praha')) AND `account_to` IN (SELECT `account_id` FROM account WHERE `district_id` IN (SELECT `district_id` FROM district WHERE `A3` = 'central Bohemia'))",
+        "SQL": "SELECT SUM(amount) FROM `order` WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A2 = 'Hl.m. Praha')) AND account_to IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A3 = 'central Bohemia'));",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 22,
+        "db_id": "financial",
+        "question": "How many clients are from district 'Hl.m. Praha' and have a frequency of 'POPLATEK MESICNE'?",
+        "evidence": "District = 'Hl.m. Praha' AND Frequency = 'POPLATEK MESICNE'",
+        "SQL": "SELECT COUNT(client_id) FROM client WHERE district_id IN (SELECT district_id FROM district WHERE A2 = 'Hl.m. Praha') AND account_id IN (SELECT account_id FROM account WHERE frequency = 'POPLATEK MESICNE');",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 23,
+        "db_id": "financial",
+        "question": "What is the average balance of transactions for each account in district 'central Bohemia'?",
+        "evidence": "Average balance = AVG(`balance`) GROUP BY `account_id` WHERE `district_id` IN (SELECT `district_id` FROM district WHERE `A3` = 'central Bohemia')",
+        "SQL": "SELECT AVG(balance) FROM trans WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A3 = 'central Bohemia')) GROUP BY account_id;",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 24,
+        "db_id": "financial",
+        "question": "What is the total amount of payments for each district in 'central Bohemia'?",
+        "evidence": "Total payments = SUM(`payments`) GROUP BY `district_id` WHERE `A3` = 'central Bohemia'",
+        "SQL": "SELECT SUM(payments) FROM loan WHERE account_id IN (SELECT account_id FROM account WHERE district_id IN (SELECT district_id FROM district WHERE A3 = 'central Bohemia')) GROUP BY district_id;",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 25,
+        "db_id": "formula_1",
+        "question": "What is the total number of constructors in the constructors table?",
+        "evidence": "COUNT(`constructorId`) FROM constructors",
+        "SQL": "SELECT COUNT(constructorId) FROM `constructors`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 26,
+        "db_id": "formula_1",
+        "question": "What is the name of the circuit with the most number of races?",
+        "evidence": "COUNT(`circuitId`) FROM races GROUP BY `circuitId`",
+        "SQL": "SELECT `name` FROM `circuits` WHERE `circuitId` = (SELECT `circuitId` FROM `races` GROUP BY `circuitId` ORDER BY COUNT(`circuitId`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 27,
+        "db_id": "formula_1",
+        "question": "What is the total number of pit stops made by driver 1?",
+        "evidence": "COUNT(`stop`) FROM `pitStops` WHERE `driverId` = 1",
+        "SQL": "SELECT COUNT(stop) FROM `pitStops` WHERE `driverId` = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 28,
+        "db_id": "formula_1",
+        "question": "What is the fastest lap time achieved by driver 2 in the 2010 season?",
+        "evidence": "MIN(`fastestLapTime`) FROM `results` WHERE `driverId` = 2 AND `year` = 2010",
+        "SQL": "SELECT MIN(`fastestLapTime`) FROM `results` WHERE `driverId` = 2 AND `year` = 2010;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 29,
+        "db_id": "formula_1",
+        "question": "What is the total number of points scored by constructor 1 in the 2009 season?",
+        "evidence": "SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 1 AND `year` = 2009",
+        "SQL": "SELECT SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 1 AND `year` = 2009;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 30,
+        "db_id": "formula_1",
+        "question": "What is the name of the driver who achieved the fastest lap time in the 2011 season?",
+        "evidence": "MIN(`fastestLapTime`) FROM `results` WHERE `year` = 2011",
+        "SQL": "SELECT `forename`, `surname` FROM `drivers` WHERE `driverId` = (SELECT `driverId` FROM `results` WHERE `year` = 2011 ORDER BY `fastestLapTime` ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 31,
+        "db_id": "formula_1",
+        "question": "What is the total number of races won by driver 3 in the 2012 season?",
+        "evidence": "COUNT(`raceId`) FROM `results` WHERE `driverId` = 3 AND `year` = 2012 AND `position` = 1",
+        "SQL": "SELECT COUNT(`raceId`) FROM `results` WHERE `driverId` = 3 AND `year` = 2012 AND `position` = 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 32,
+        "db_id": "formula_1",
+        "question": "What is the name of the circuit with the highest average speed?",
+        "evidence": "AVG(`fastestLapSpeed`) FROM `results` GROUP BY `circuitId`",
+        "SQL": "SELECT `name` FROM `circuits` WHERE `circuitId` = (SELECT `circuitId` FROM `results` GROUP BY `circuitId` ORDER BY AVG(`fastestLapSpeed`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 33,
+        "db_id": "formula_1",
+        "question": "What is the total number of points scored by driver 2 in the 2010 season?",
+        "evidence": "SUM(`points`) FROM `driverStandings` WHERE `driverId` = 2 AND `year` = 2010",
+        "SQL": "SELECT SUM(`points`) FROM `driverStandings` WHERE `driverId` = 2 AND `year` = 2010;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 34,
+        "db_id": "formula_1",
+        "question": "What is the name of the constructor with the most number of wins in the 2011 season?",
+        "evidence": "COUNT(`raceId`) FROM `results` WHERE `year` = 2011 AND `position` = 1 GROUP BY `constructorId`",
+        "SQL": "SELECT `name` FROM `constructors` WHERE `constructorId` = (SELECT `constructorId` FROM `results` WHERE `year` = 2011 AND `position` = 1 GROUP BY `constructorId` ORDER BY COUNT(`raceId`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 35,
+        "db_id": "formula_1",
+        "question": "What is the total number of pit stops made by all drivers in the 2012 season?",
+        "evidence": "COUNT(`stop`) FROM `pitStops` WHERE `year` = 2012",
+        "SQL": "SELECT COUNT(`stop`) FROM `pitStops` WHERE `year` = 2012;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 36,
+        "db_id": "formula_1",
+        "question": "What is the name of the driver who achieved the fastest lap time in the 2009 season?",
+        "evidence": "MIN(`fastestLapTime`) FROM `results` WHERE `year` = 2009",
+        "SQL": "SELECT `forename`, `surname` FROM `drivers` WHERE `driverId` = (SELECT `driverId` FROM `results` WHERE `year` = 2009 ORDER BY `fastestLapTime` ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 37,
+        "db_id": "formula_1",
+        "question": "What is the total number of points scored by constructor 2 in the 2010 season?",
+        "evidence": "SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 2 AND `year` = 2010",
+        "SQL": "SELECT SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 2 AND `year` = 2010;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 38,
+        "db_id": "formula_1",
+        "question": "What is the name of the circuit with the most number of races in the 2011 season?",
+        "evidence": "COUNT(`raceId`) FROM `races` WHERE `year` = 2011 GROUP BY `circuitId`",
+        "SQL": "SELECT `name` FROM `circuits` WHERE `circuitId` = (SELECT `circuitId` FROM `races` WHERE `year` = 2011 GROUP BY `circuitId` ORDER BY COUNT(`raceId`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 39,
+        "db_id": "formula_1",
+        "question": "What is the total number of wins achieved by driver 1 in the 2012 season?",
+        "evidence": "COUNT(`raceId`) FROM `results` WHERE `driverId` = 1 AND `year` = 2012 AND `position` = 1",
+        "SQL": "SELECT COUNT(`raceId`) FROM `results` WHERE `driverId` = 1 AND `year` = 2012 AND `position` = 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 40,
+        "db_id": "formula_1",
+        "question": "What is the name of the constructor with the most number of points in the 2010 season?",
+        "evidence": "SUM(`points`) FROM `constructorStandings` WHERE `year` = 2010 GROUP BY `constructorId`",
+        "SQL": "SELECT `name` FROM `constructors` WHERE `constructorId` = (SELECT `constructorId` FROM `constructorStandings` WHERE `year` = 2010 GROUP BY `constructorId` ORDER BY SUM(`points`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 41,
+        "db_id": "formula_1",
+        "question": "What is the total number of pit stops made by driver 3 in the 2011 season?",
+        "evidence": "COUNT(`stop`) FROM `pitStops` WHERE `driverId` = 3 AND `year` = 2011",
+        "SQL": "SELECT COUNT(`stop`) FROM `pitStops` WHERE `driverId` = 3 AND `year` = 2011;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 42,
+        "db_id": "formula_1",
+        "question": "What is the name of the driver who achieved the fastest lap time in the 2012 season?",
+        "evidence": "MIN(`fastestLapTime`) FROM `results` WHERE `year` = 2012",
+        "SQL": "SELECT `forename`, `surname` FROM `drivers` WHERE `driverId` = (SELECT `driverId` FROM `results` WHERE `year` = 2012 ORDER BY `fastestLapTime` ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 43,
+        "db_id": "formula_1",
+        "question": "What is the total number of points scored by driver 2 in the 2011 season?",
+        "evidence": "SUM(`points`) FROM `driverStandings` WHERE `driverId` = 2 AND `year` = 2011",
+        "SQL": "SELECT SUM(`points`) FROM `driverStandings` WHERE `driverId` = 2 AND `year` = 2011;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 44,
+        "db_id": "formula_1",
+        "question": "What is the name of the circuit with the highest average speed in the 2010 season?",
+        "evidence": "AVG(`fastestLapSpeed`) FROM `results` WHERE `year` = 2010 GROUP BY `circuitId`",
+        "SQL": "SELECT `name` FROM `circuits` WHERE `circuitId` = (SELECT `circuitId` FROM `results` WHERE `year` = 2010 GROUP BY `circuitId` ORDER BY AVG(`fastestLapSpeed`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 45,
+        "db_id": "formula_1",
+        "question": "What is the total number of wins achieved by constructor 1 in the 2011 season?",
+        "evidence": "COUNT(`raceId`) FROM `results` WHERE `constructorId` = 1 AND `year` = 2011 AND `position` = 1",
+        "SQL": "SELECT COUNT(`raceId`) FROM `results` WHERE `constructorId` = 1 AND `year` = 2011 AND `position` = 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 46,
+        "db_id": "formula_1",
+        "question": "What is the name of the driver who achieved the fastest lap time in the 2010 season?",
+        "evidence": "MIN(`fastestLapTime`) FROM `results` WHERE `year` = 2010",
+        "SQL": "SELECT `forename`, `surname` FROM `drivers` WHERE `driverId` = (SELECT `driverId` FROM `results` WHERE `year` = 2010 ORDER BY `fastestLapTime` ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 47,
+        "db_id": "formula_1",
+        "question": "What is the total number of points scored by constructor 3 in the 2012 season?",
+        "evidence": "SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 3 AND `year` = 2012",
+        "SQL": "SELECT SUM(`points`) FROM `constructorStandings` WHERE `constructorId` = 3 AND `year` = 2012;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 48,
+        "db_id": "formula_1",
+        "question": "What is the name of the circuit with the most number of races in the 2012 season?",
+        "evidence": "COUNT(`raceId`) FROM `races` WHERE `year` = 2012 GROUP BY `circuitId`",
+        "SQL": "SELECT `name` FROM `circuits` WHERE `circuitId` = (SELECT `circuitId` FROM `races` WHERE `year` = 2012 GROUP BY `circuitId` ORDER BY COUNT(`raceId`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 49,
+        "db_id": "formula_1",
+        "question": "What is the total number of pit stops made by all drivers in the 2011 season?",
+        "evidence": "COUNT(`stop`) FROM `pitStops` WHERE `year` = 2011",
+        "SQL": "SELECT COUNT(`stop`) FROM `pitStops` WHERE `year` = 2011;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 50,
+        "db_id": "formula_1",
+        "question": "What is the name of the constructor with the most number of wins in the 2012 season?",
+        "evidence": "COUNT(`raceId`) FROM `results` WHERE `year` = 2012 AND `position` = 1 GROUP BY `constructorId`",
+        "SQL": "SELECT `name` FROM `constructors` WHERE `constructorId` = (SELECT `constructorId` FROM `results` WHERE `year` = 2012 AND `position` = 1 GROUP BY `constructorId` ORDER BY COUNT(`raceId`) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 51,
+        "db_id": "card_games",
+        "question": "What is the name of the card with the highest converted mana cost?",
+        "evidence": "The card with the highest converted mana cost can be found by selecting the maximum convertedManaCost from the `cards` table",
+        "SQL": "SELECT name FROM `cards` ORDER BY convertedManaCost DESC LIMIT 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 52,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific rarity?",
+        "evidence": "The number of cards with a specific rarity can be found by counting the number of rows in the `cards` table with the specified rarity",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE rarity = 'common';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 53,
+        "db_id": "card_games",
+        "question": "What is the average life total of all creatures?",
+        "evidence": "The average life total of all creatures can be found by averaging the life column in the `cards` table where the type is 'Creature'",
+        "SQL": "SELECT AVG(life) FROM `cards` WHERE type LIKE '%Creature%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 54,
+        "db_id": "card_games",
+        "question": "What is the name of the set with the most cards?",
+        "evidence": "The set with the most cards can be found by joining the `cards` table with the `sets` table and counting the number of cards in each set",
+        "SQL": "SELECT T2.name FROM `cards` AS T1 JOIN `sets` AS T2 ON T1.setCode = T2.code GROUP BY T2.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 55,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific keyword?",
+        "evidence": "The number of cards with a specific keyword can be found by counting the number of rows in the `cards` table with the specified keyword",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE keywords LIKE '%Flying%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 56,
+        "db_id": "card_games",
+        "question": "What is the name of the card with the most printings?",
+        "evidence": "The card with the most printings can be found by selecting the card with the most printings from the `cards` table",
+        "SQL": "SELECT name FROM `cards` ORDER BY LENGTH(printings) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 57,
+        "db_id": "card_games",
+        "question": "What is the average converted mana cost of all cards?",
+        "evidence": "The average converted mana cost of all cards can be found by averaging the convertedManaCost column in the `cards` table",
+        "SQL": "SELECT AVG(convertedManaCost) FROM `cards`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 58,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific subtype?",
+        "evidence": "The number of cards with a specific subtype can be found by counting the number of rows in the `cards` table with the specified subtype",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE subtypes LIKE '%Human%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 59,
+        "db_id": "card_games",
+        "question": "What is the name of the set with the highest average converted mana cost?",
+        "evidence": "The set with the highest average converted mana cost can be found by joining the `cards` table with the `sets` table and averaging the convertedManaCost of each set",
+        "SQL": "SELECT T2.name FROM `cards` AS T1 JOIN `sets` AS T2 ON T1.setCode = T2.code GROUP BY T2.name ORDER BY AVG(T1.convertedManaCost) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 60,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific supertype?",
+        "evidence": "The number of cards with a specific supertype can be found by counting the number of rows in the `cards` table with the specified supertype",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE supertypes LIKE '%Basic%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 61,
+        "db_id": "card_games",
+        "question": "What is the name of the card with the most foreign translations?",
+        "evidence": "The card with the most foreign translations can be found by joining the `cards` table with the `foreign_data` table and counting the number of translations for each card",
+        "SQL": "SELECT T1.name FROM `cards` AS T1 JOIN `foreign_data` AS T2 ON T1.uuid = T2.uuid GROUP BY T1.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 62,
+        "db_id": "card_games",
+        "question": "What is the average power of all creatures?",
+        "evidence": "The average power of all creatures can be found by averaging the power column in the `cards` table where the type is 'Creature'",
+        "SQL": "SELECT AVG(power) FROM `cards` WHERE type LIKE '%Creature%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 63,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific flavor text?",
+        "evidence": "The number of cards with a specific flavor text can be found by counting the number of rows in the `cards` table with the specified flavor text",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE flavorText LIKE '%First strike%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 64,
+        "db_id": "card_games",
+        "question": "What is the name of the set with the most cards with a specific rarity?",
+        "evidence": "The set with the most cards with a specific rarity can be found by joining the `cards` table with the `sets` table and counting the number of cards with the specified rarity in each set",
+        "SQL": "SELECT T2.name FROM `cards` AS T1 JOIN `sets` AS T2 ON T1.setCode = T2.code WHERE T1.rarity = 'common' GROUP BY T2.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 65,
+        "db_id": "card_games",
+        "question": "What is the average toughness of all creatures?",
+        "evidence": "The average toughness of all creatures can be found by averaging the toughness column in the `cards` table where the type is 'Creature'",
+        "SQL": "SELECT AVG(toughness) FROM `cards` WHERE type LIKE '%Creature%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 66,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific mana cost?",
+        "evidence": "The number of cards with a specific mana cost can be found by counting the number of rows in the `cards` table with the specified mana cost",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE manaCost = '{3}{W}';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 67,
+        "db_id": "card_games",
+        "question": "What is the name of the card with the most rulings?",
+        "evidence": "The card with the most rulings can be found by joining the `cards` table with the `rulings` table and counting the number of rulings for each card",
+        "SQL": "SELECT T1.name FROM `cards` AS T1 JOIN `rulings` AS T2 ON T1.uuid = T2.uuid GROUP BY T1.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 68,
+        "db_id": "card_games",
+        "question": "What is the average converted mana cost of all cards with a specific keyword?",
+        "evidence": "The average converted mana cost of all cards with a specific keyword can be found by averaging the convertedManaCost column in the `cards` table where the keyword is specified",
+        "SQL": "SELECT AVG(convertedManaCost) FROM `cards` WHERE keywords LIKE '%Flying%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 69,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific set code?",
+        "evidence": "The number of cards with a specific set code can be found by counting the number of rows in the `cards` table with the specified set code",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE setCode = '10E';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 70,
+        "db_id": "card_games",
+        "question": "What is the name of the set with the most cards with a specific subtype?",
+        "evidence": "The set with the most cards with a specific subtype can be found by joining the `cards` table with the `sets` table and counting the number of cards with the specified subtype in each set",
+        "SQL": "SELECT T2.name FROM `cards` AS T1 JOIN `sets` AS T2 ON T1.setCode = T2.code WHERE T1.subtypes LIKE '%Human%' GROUP BY T2.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 71,
+        "db_id": "card_games",
+        "question": "What is the average power of all creatures with a specific supertype?",
+        "evidence": "The average power of all creatures with a specific supertype can be found by averaging the power column in the `cards` table where the type is 'Creature' and the supertype is specified",
+        "SQL": "SELECT AVG(power) FROM `cards` WHERE type LIKE '%Creature%' AND supertypes LIKE '%Basic%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 72,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific flavor name?",
+        "evidence": "The number of cards with a specific flavor name can be found by counting the number of rows in the `cards` table with the specified flavor name",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE flavorName LIKE '%Ancestor%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 73,
+        "db_id": "card_games",
+        "question": "What is the name of the card with the most foreign translations in a specific language?",
+        "evidence": "The card with the most foreign translations in a specific language can be found by joining the `cards` table with the `foreign_data` table and counting the number of translations for each card in the specified language",
+        "SQL": "SELECT T1.name FROM `cards` AS T1 JOIN `foreign_data` AS T2 ON T1.uuid = T2.uuid WHERE T2.language = 'German' GROUP BY T1.name ORDER BY COUNT(*) DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 74,
+        "db_id": "card_games",
+        "question": "What is the average toughness of all creatures with a specific keyword?",
+        "evidence": "The average toughness of all creatures with a specific keyword can be found by averaging the toughness column in the `cards` table where the type is 'Creature' and the keyword is specified",
+        "SQL": "SELECT AVG(toughness) FROM `cards` WHERE type LIKE '%Creature%' AND keywords LIKE '%Flying%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 75,
+        "db_id": "card_games",
+        "question": "What is the number of cards with a specific set code and rarity?",
+        "evidence": "The number of cards with a specific set code and rarity can be found by counting the number of rows in the `cards` table with the specified set code and rarity",
+        "SQL": "SELECT COUNT(*) FROM `cards` WHERE setCode = '10E' AND rarity = 'common';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 76,
+        "db_id": "student_club",
+        "question": "What is the total number of events in the database?",
+        "evidence": "Total number of events = COUNT(`event_id`)",
+        "SQL": "SELECT COUNT(event_id) FROM `event`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 77,
+        "db_id": "student_club",
+        "question": "What is the average cost of expenses for all members?",
+        "evidence": "Average cost = AVG(`cost`) FROM `expense`",
+        "SQL": "SELECT AVG(cost) FROM `expense`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 78,
+        "db_id": "student_club",
+        "question": "What is the total number of members in the database?",
+        "evidence": "Total number of members = COUNT(`member_id`)",
+        "SQL": "SELECT COUNT(member_id) FROM `member`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 79,
+        "db_id": "student_club",
+        "question": "What is the total amount of money spent on food from the budget?",
+        "evidence": "Total amount spent on food = SUM(`amount`) WHERE `category` = 'Food'",
+        "SQL": "SELECT SUM(amount) FROM `budget` WHERE category = 'Food';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 80,
+        "db_id": "student_club",
+        "question": "What is the total number of attendance records in the database?",
+        "evidence": "Total number of attendance records = COUNT(`link_to_event`)",
+        "SQL": "SELECT COUNT(link_to_event) FROM `attendance`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 81,
+        "db_id": "student_club",
+        "question": "What is the average amount of money received from income?",
+        "evidence": "Average amount received = AVG(`amount`) FROM `income`",
+        "SQL": "SELECT AVG(amount) FROM `income`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 82,
+        "db_id": "student_club",
+        "question": "What is the total number of unique zip codes in the database?",
+        "evidence": "Total number of unique zip codes = COUNT(DISTINCT `zip_code`)",
+        "SQL": "SELECT COUNT(DISTINCT zip_code) FROM `zip_code`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 83,
+        "db_id": "student_club",
+        "question": "What is the total number of major records in the database?",
+        "evidence": "Total number of major records = COUNT(`major_id`)",
+        "SQL": "SELECT COUNT(major_id) FROM `major`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 84,
+        "db_id": "student_club",
+        "question": "What are the event names of all events in the database?",
+        "evidence": "Event names = `event_name` FROM `event`",
+        "SQL": "SELECT event_name FROM `event`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 85,
+        "db_id": "student_club",
+        "question": "What are the member names of all members in the database?",
+        "evidence": "Member names = `first_name` + ' ' + `last_name` FROM `member`",
+        "SQL": "SELECT first_name, last_name FROM `member`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 86,
+        "db_id": "student_club",
+        "question": "What is the total number of expenses for each member?",
+        "evidence": "Total number of expenses for each member = COUNT(`expense_id`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, COUNT(expense_id) FROM `expense` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 87,
+        "db_id": "student_club",
+        "question": "What is the total amount of money spent by each member?",
+        "evidence": "Total amount spent by each member = SUM(`cost`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, SUM(cost) FROM `expense` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 88,
+        "db_id": "student_club",
+        "question": "What is the average cost of expenses for each member?",
+        "evidence": "Average cost of expenses for each member = AVG(`cost`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, AVG(cost) FROM `expense` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 89,
+        "db_id": "student_club",
+        "question": "What are the event names of all events attended by a specific member?",
+        "evidence": "Event names = `event_name` FROM `event` JOIN `attendance` ON `event`.event_id = `attendance`.link_to_event WHERE `attendance`.link_to_member = 'specific member'",
+        "SQL": "SELECT T1.event_name FROM `event` T1 JOIN `attendance` T2 ON T1.event_id = T2.link_to_event WHERE T2.link_to_member = 'recD078PnS3x2doBe';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 90,
+        "db_id": "student_club",
+        "question": "What are the member names of all members who attended a specific event?",
+        "evidence": "Member names = `first_name` + ' ' + `last_name` FROM `member` JOIN `attendance` ON `member`.member_id = `attendance`.link_to_member WHERE `attendance`.link_to_event = 'specific event'",
+        "SQL": "SELECT T1.first_name, T1.last_name FROM `member` T1 JOIN `attendance` T2 ON T1.member_id = T2.link_to_member WHERE T2.link_to_event = 'rec2N69DMcrqN9PJC';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 91,
+        "db_id": "student_club",
+        "question": "What is the total number of income records for each member?",
+        "evidence": "Total number of income records for each member = COUNT(`income_id`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, COUNT(income_id) FROM `income` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 92,
+        "db_id": "student_club",
+        "question": "What is the total amount of money received by each member?",
+        "evidence": "Total amount received by each member = SUM(`amount`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, SUM(amount) FROM `income` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 93,
+        "db_id": "student_club",
+        "question": "What is the average amount of money received by each member?",
+        "evidence": "Average amount received by each member = AVG(`amount`) GROUP BY `link_to_member`",
+        "SQL": "SELECT link_to_member, AVG(amount) FROM `income` GROUP BY link_to_member;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 94,
+        "db_id": "student_club",
+        "question": "What are the major names of all majors in the database?",
+        "evidence": "Major names = `major_name` FROM `major`",
+        "SQL": "SELECT major_name FROM `major`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 95,
+        "db_id": "student_club",
+        "question": "What are the department names of all departments in the database?",
+        "evidence": "Department names = `department` FROM `major`",
+        "SQL": "SELECT department FROM `major`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 96,
+        "db_id": "student_club",
+        "question": "What are the college names of all colleges in the database?",
+        "evidence": "College names = `college` FROM `major`",
+        "SQL": "SELECT college FROM `major`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 97,
+        "db_id": "student_club",
+        "question": "What is the total number of budget records for each event?",
+        "evidence": "Total number of budget records for each event = COUNT(`budget_id`) GROUP BY `link_to_event`",
+        "SQL": "SELECT link_to_event, COUNT(budget_id) FROM `budget` GROUP BY link_to_event;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 98,
+        "db_id": "student_club",
+        "question": "What is the total amount of money spent on each event?",
+        "evidence": "Total amount spent on each event = SUM(`amount`) GROUP BY `link_to_event`",
+        "SQL": "SELECT link_to_event, SUM(amount) FROM `budget` GROUP BY link_to_event;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 99,
+        "db_id": "student_club",
+        "question": "What is the average amount of money spent on each event?",
+        "evidence": "Average amount spent on each event = AVG(`amount`) GROUP BY `link_to_event`",
+        "SQL": "SELECT link_to_event, AVG(amount) FROM `budget` GROUP BY link_to_event;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 100,
+        "db_id": "student_club",
+        "question": "What are the event names of all events with a specific status?",
+        "evidence": "Event names = `event_name` FROM `event` WHERE `status` = 'specific status'",
+        "SQL": "SELECT event_name FROM `event` WHERE status = 'Open';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 101,
+        "db_id": "student_club",
+        "question": "What are the member names of all members with a specific position?",
+        "evidence": "Member names = `first_name` + ' ' + `last_name` FROM `member` WHERE `position` = 'specific position'",
+        "SQL": "SELECT first_name, last_name FROM `member` WHERE position = 'Member';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 102,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total number of customers in the database?",
+        "evidence": "Total customers = COUNT(*) FROM customers",
+        "SQL": "SELECT COUNT(*) FROM `customers`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 103,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different segments of customers?",
+        "evidence": "Segments = SELECT DISTINCT Segment FROM customers",
+        "SQL": "SELECT DISTINCT `Segment` FROM `customers`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 104,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total amount of money spent by customers in the year 2013?",
+        "evidence": "Total amount spent = SUM(Consumption) FROM yearmonth WHERE Date LIKE '2013%'",
+        "SQL": "SELECT SUM(`Consumption`) FROM `yearmonth` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 105,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different products available at the gas stations?",
+        "evidence": "Products = SELECT Description FROM products",
+        "SQL": "SELECT `Description` FROM `products`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 106,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total number of transactions made by customers?",
+        "evidence": "Total transactions = COUNT(*) FROM transactions_1k",
+        "SQL": "SELECT COUNT(*) FROM `transactions_1k`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 107,
+        "db_id": "debit_card_specializing",
+        "question": "What is the average consumption of customers in the year 2013?",
+        "evidence": "Average consumption = AVG(Consumption) FROM yearmonth WHERE Date LIKE '2013%'",
+        "SQL": "SELECT AVG(`Consumption`) FROM `yearmonth` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 108,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different gas stations available?",
+        "evidence": "Gas stations = SELECT GasStationID FROM gasstations",
+        "SQL": "SELECT `GasStationID` FROM `gasstations`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 109,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total number of customers who made transactions in the year 2013?",
+        "evidence": "Total customers = COUNT(DISTINCT CustomerID) FROM transactions_1k WHERE Date LIKE '2013%'",
+        "SQL": "SELECT COUNT(DISTINCT `CustomerID`) FROM `transactions_1k` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 110,
+        "db_id": "debit_card_specializing",
+        "question": "What is the maximum consumption of a customer in the year 2013?",
+        "evidence": "Max consumption = MAX(Consumption) FROM yearmonth WHERE Date LIKE '2013%'",
+        "SQL": "SELECT MAX(`Consumption`) FROM `yearmonth` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 111,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different currencies used by customers?",
+        "evidence": "Currencies = SELECT DISTINCT Currency FROM customers",
+        "SQL": "SELECT DISTINCT `Currency` FROM `customers`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 112,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total amount of money spent by customers at gas station 44?",
+        "evidence": "Total amount spent = SUM(Amount * Price) FROM transactions_1k WHERE GasStationID = 44",
+        "SQL": "SELECT SUM(`Amount` * `Price`) FROM `transactions_1k` WHERE `GasStationID` = 44;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 113,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different chains of gas stations available?",
+        "evidence": "Chains = SELECT DISTINCT ChainID FROM gasstations",
+        "SQL": "SELECT DISTINCT `ChainID` FROM `gasstations`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 114,
+        "db_id": "debit_card_specializing",
+        "question": "What is the average price of a product at gas station 44?",
+        "evidence": "Average price = AVG(Price) FROM transactions_1k WHERE GasStationID = 44",
+        "SQL": "SELECT AVG(`Price`) FROM `transactions_1k` WHERE `GasStationID` = 44;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 115,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different countries where gas stations are located?",
+        "evidence": "Countries = SELECT DISTINCT Country FROM gasstations",
+        "SQL": "SELECT DISTINCT `Country` FROM `gasstations`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 116,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total number of transactions made by customers at gas station 44?",
+        "evidence": "Total transactions = COUNT(*) FROM transactions_1k WHERE GasStationID = 44",
+        "SQL": "SELECT COUNT(*) FROM `transactions_1k` WHERE `GasStationID` = 44;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 117,
+        "db_id": "debit_card_specializing",
+        "question": "What is the maximum amount of money spent by a customer in a single transaction?",
+        "evidence": "Max amount spent = MAX(Amount * Price) FROM transactions_1k",
+        "SQL": "SELECT MAX(`Amount` * `Price`) FROM `transactions_1k`;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 118,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different segments of gas stations available?",
+        "evidence": "Segments = SELECT DISTINCT Segment FROM gasstations",
+        "SQL": "SELECT DISTINCT `Segment` FROM `gasstations`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 119,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total amount of money spent by customers on product 1?",
+        "evidence": "Total amount spent = SUM(Amount * Price) FROM transactions_1k WHERE ProductID = 1",
+        "SQL": "SELECT SUM(`Amount` * `Price`) FROM `transactions_1k` WHERE `ProductID` = 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 120,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different products purchased by customers at gas station 44?",
+        "evidence": "Products = SELECT DISTINCT ProductID FROM transactions_1k WHERE GasStationID = 44",
+        "SQL": "SELECT DISTINCT `ProductID` FROM `transactions_1k` WHERE `GasStationID` = 44;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 121,
+        "db_id": "debit_card_specializing",
+        "question": "What is the average consumption of customers in the month of July 2013?",
+        "evidence": "Average consumption = AVG(Consumption) FROM yearmonth WHERE Date LIKE '201307'",
+        "SQL": "SELECT AVG(`Consumption`) FROM `yearmonth` WHERE `Date` LIKE '201307';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 122,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different chains of gas stations where customers made transactions?",
+        "evidence": "Chains = SELECT DISTINCT T2.ChainID FROM transactions_1k AS T1 INNER JOIN gasstations AS T2 ON T1.GasStationID = T2.GasStationID",
+        "SQL": "SELECT DISTINCT T2.`ChainID` FROM `transactions_1k` AS T1 INNER JOIN `gasstations` AS T2 ON T1.`GasStationID` = T2.`GasStationID`;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 123,
+        "db_id": "debit_card_specializing",
+        "question": "What is the total amount of money spent by customers at gas stations in the country 'CZE'?",
+        "evidence": "Total amount spent = SUM(T1.Amount * T1.Price) FROM transactions_1k AS T1 INNER JOIN gasstations AS T2 ON T1.GasStationID = T2.GasStationID WHERE T2.Country = 'CZE'",
+        "SQL": "SELECT SUM(T1.`Amount` * T1.`Price`) FROM `transactions_1k` AS T1 INNER JOIN `gasstations` AS T2 ON T1.`GasStationID` = T2.`GasStationID` WHERE T2.`Country` = 'CZE';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 124,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different segments of customers who made transactions at gas station 44?",
+        "evidence": "Segments = SELECT DISTINCT T2.Segment FROM transactions_1k AS T1 INNER JOIN customers AS T2 ON T1.CustomerID = T2.CustomerID WHERE T1.GasStationID = 44",
+        "SQL": "SELECT DISTINCT T2.`Segment` FROM `transactions_1k` AS T1 INNER JOIN `customers` AS T2 ON T1.`CustomerID` = T2.`CustomerID` WHERE T1.`GasStationID` = 44;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 125,
+        "db_id": "debit_card_specializing",
+        "question": "What is the average price of a product purchased by customers in the year 2013?",
+        "evidence": "Average price = AVG(Price) FROM transactions_1k WHERE Date LIKE '2013%'",
+        "SQL": "SELECT AVG(`Price`) FROM `transactions_1k` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 126,
+        "db_id": "debit_card_specializing",
+        "question": "What are the different products purchased by customers in the year 2013?",
+        "evidence": "Products = SELECT DISTINCT ProductID FROM transactions_1k WHERE Date LIKE '2013%'",
+        "SQL": "SELECT DISTINCT `ProductID` FROM `transactions_1k` WHERE `Date` LIKE '2013%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 127,
+        "db_id": "chemistry",
+        "question": "What are the unique elements in the atom table?",
+        "evidence": "Unique elements = DISTINCT element FROM atom",
+        "SQL": "SELECT DISTINCT element FROM `atom`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 128,
+        "db_id": "chemistry",
+        "question": "How many atoms are in the molecule with id TR000?",
+        "evidence": "Count atoms = COUNT(atom_id) WHERE molecule_id = TR000",
+        "SQL": "SELECT COUNT(atom_id) FROM `atom` WHERE molecule_id = 'TR000';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 129,
+        "db_id": "chemistry",
+        "question": "What are the bond types in the bond table?",
+        "evidence": "Bond types = DISTINCT bond_type FROM bond",
+        "SQL": "SELECT DISTINCT bond_type FROM `bond`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 130,
+        "db_id": "chemistry",
+        "question": "How many bonds are in the molecule with id TR000?",
+        "evidence": "Count bonds = COUNT(bond_id) WHERE molecule_id = TR000",
+        "SQL": "SELECT COUNT(bond_id) FROM `bond` WHERE molecule_id = 'TR000';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 131,
+        "db_id": "chemistry",
+        "question": "What are the connected atoms in the connected table?",
+        "evidence": "Connected atoms = atom_id, atom_id2 FROM connected",
+        "SQL": "SELECT atom_id, atom_id2 FROM `connected`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 132,
+        "db_id": "chemistry",
+        "question": "How many molecules are in the molecule table?",
+        "evidence": "Count molecules = COUNT(molecule_id) FROM molecule",
+        "SQL": "SELECT COUNT(molecule_id) FROM `molecule`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 133,
+        "db_id": "chemistry",
+        "question": "What are the labels of the molecules in the molecule table?",
+        "evidence": "Labels = label FROM molecule",
+        "SQL": "SELECT label FROM `molecule`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 134,
+        "db_id": "chemistry",
+        "question": "How many atoms are connected to the atom with id TR000_1?",
+        "evidence": "Count connected atoms = COUNT(atom_id2) WHERE atom_id = TR000_1",
+        "SQL": "SELECT COUNT(atom_id2) FROM `connected` WHERE atom_id = 'TR000_1';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 135,
+        "db_id": "chemistry",
+        "question": "What are the bond types of the bonds in the molecule with id TR000?",
+        "evidence": "Bond types = bond_type FROM bond WHERE molecule_id = TR000",
+        "SQL": "SELECT bond_type FROM `bond` WHERE molecule_id = 'TR000';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 136,
+        "db_id": "chemistry",
+        "question": "How many bonds are connected to the atom with id TR000_2?",
+        "evidence": "Count bonds = COUNT(bond_id) WHERE atom_id = TR000_2",
+        "SQL": "SELECT COUNT(bond_id) FROM `connected` WHERE atom_id = 'TR000_2';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 137,
+        "db_id": "chemistry",
+        "question": "What are the elements of the atoms in the molecule with id TR000?",
+        "evidence": "Elements = element FROM atom WHERE molecule_id = TR000",
+        "SQL": "SELECT element FROM `atom` WHERE molecule_id = 'TR000';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 138,
+        "db_id": "chemistry",
+        "question": "How many molecules have a label of +?",
+        "evidence": "Count molecules = COUNT(molecule_id) WHERE label = +",
+        "SQL": "SELECT COUNT(molecule_id) FROM `molecule` WHERE label = '+';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 139,
+        "db_id": "chemistry",
+        "question": "What are the bond ids of the bonds in the molecule with id TR000?",
+        "evidence": "Bond ids = bond_id FROM bond WHERE molecule_id = TR000",
+        "SQL": "SELECT bond_id FROM `bond` WHERE molecule_id = 'TR000';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 140,
+        "db_id": "chemistry",
+        "question": "How many atoms are in the molecule with id TR001?",
+        "evidence": "Count atoms = COUNT(atom_id) WHERE molecule_id = TR001",
+        "SQL": "SELECT COUNT(atom_id) FROM `atom` WHERE molecule_id = 'TR001';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 141,
+        "db_id": "chemistry",
+        "question": "What are the connected atoms in the connected table for the molecule with id TR000?",
+        "evidence": "Connected atoms = atom_id, atom_id2 FROM connected WHERE bond_id IN (SELECT bond_id FROM bond WHERE molecule_id = TR000)",
+        "SQL": "SELECT atom_id, atom_id2 FROM `connected` WHERE bond_id IN (SELECT bond_id FROM `bond` WHERE molecule_id = 'TR000');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 142,
+        "db_id": "chemistry",
+        "question": "How many bonds are in the molecule with id TR002?",
+        "evidence": "Count bonds = COUNT(bond_id) WHERE molecule_id = TR002",
+        "SQL": "SELECT COUNT(bond_id) FROM `bond` WHERE molecule_id = 'TR002';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 143,
+        "db_id": "chemistry",
+        "question": "What are the elements of the atoms connected to the atom with id TR000_1?",
+        "evidence": "Elements = element FROM atom WHERE atom_id IN (SELECT atom_id2 FROM connected WHERE atom_id = TR000_1)",
+        "SQL": "SELECT element FROM `atom` WHERE atom_id IN (SELECT atom_id2 FROM `connected` WHERE atom_id = 'TR000_1');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 144,
+        "db_id": "chemistry",
+        "question": "How many molecules have a label of -?",
+        "evidence": "Count molecules = COUNT(molecule_id) WHERE label = -",
+        "SQL": "SELECT COUNT(molecule_id) FROM `molecule` WHERE label = '-';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 145,
+        "db_id": "chemistry",
+        "question": "What are the bond types of the bonds connected to the atom with id TR000_2?",
+        "evidence": "Bond types = bond_type FROM bond WHERE bond_id IN (SELECT bond_id FROM connected WHERE atom_id = TR000_2)",
+        "SQL": "SELECT bond_type FROM `bond` WHERE bond_id IN (SELECT bond_id FROM `connected` WHERE atom_id = 'TR000_2');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 146,
+        "db_id": "chemistry",
+        "question": "How many atoms are in the molecule with id TR002?",
+        "evidence": "Count atoms = COUNT(atom_id) WHERE molecule_id = TR002",
+        "SQL": "SELECT COUNT(atom_id) FROM `atom` WHERE molecule_id = 'TR002';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 147,
+        "db_id": "chemistry",
+        "question": "What are the connected atoms in the connected table for the molecule with id TR001?",
+        "evidence": "Connected atoms = atom_id, atom_id2 FROM connected WHERE bond_id IN (SELECT bond_id FROM bond WHERE molecule_id = TR001)",
+        "SQL": "SELECT atom_id, atom_id2 FROM `connected` WHERE bond_id IN (SELECT bond_id FROM `bond` WHERE molecule_id = 'TR001');",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 148,
+        "db_id": "chemistry",
+        "question": "How many bonds are in the molecule with id TR001?",
+        "evidence": "Count bonds = COUNT(bond_id) WHERE molecule_id = TR001",
+        "SQL": "SELECT COUNT(bond_id) FROM `bond` WHERE molecule_id = 'TR001';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 149,
+        "db_id": "chemistry",
+        "question": "What are the elements of the atoms in the molecule with id TR002?",
+        "evidence": "Elements = element FROM atom WHERE molecule_id = TR002",
+        "SQL": "SELECT element FROM `atom` WHERE molecule_id = 'TR002';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 150,
+        "db_id": "chemistry",
+        "question": "How many molecules have a label of + or -?",
+        "evidence": "Count molecules = COUNT(molecule_id) WHERE label = + OR label = -",
+        "SQL": "SELECT COUNT(molecule_id) FROM `molecule` WHERE label = '+' OR label = '-';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 151,
+        "db_id": "chemistry",
+        "question": "What are the bond ids of the bonds in the molecule with id TR002?",
+        "evidence": "Bond ids = bond_id FROM bond WHERE molecule_id = TR002",
+        "SQL": "SELECT bond_id FROM `bond` WHERE molecule_id = 'TR002';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 152,
+        "db_id": "european_football_2",
+        "question": "What is the name of the country with the id of 1?",
+        "evidence": "The country id is given as 1",
+        "SQL": "SELECT name FROM `Country` WHERE id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 153,
+        "db_id": "european_football_2",
+        "question": "What is the total number of leagues in the database?",
+        "evidence": "Count the number of rows in the League table",
+        "SQL": "SELECT COUNT(*) FROM `League`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 154,
+        "db_id": "european_football_2",
+        "question": "What is the name of the league with the id of 1?",
+        "evidence": "The league id is given as 1",
+        "SQL": "SELECT name FROM `League` WHERE id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 155,
+        "db_id": "european_football_2",
+        "question": "What is the total number of matches played in the 2008/2009 season?",
+        "evidence": "Count the number of rows in the Match table where season is 2008/2009",
+        "SQL": "SELECT COUNT(*) FROM `Match` WHERE season = '2008/2009';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 156,
+        "db_id": "european_football_2",
+        "question": "What is the name of the player with the id of 1?",
+        "evidence": "The player id is given as 1",
+        "SQL": "SELECT player_name FROM `Player` WHERE id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 157,
+        "db_id": "european_football_2",
+        "question": "What is the total number of players in the database?",
+        "evidence": "Count the number of rows in the Player table",
+        "SQL": "SELECT COUNT(*) FROM `Player`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 158,
+        "db_id": "european_football_2",
+        "question": "What is the name of the team with the id of 1?",
+        "evidence": "The team id is given as 1",
+        "SQL": "SELECT team_long_name FROM `Team` WHERE id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 159,
+        "db_id": "european_football_2",
+        "question": "What is the total number of teams in the database?",
+        "evidence": "Count the number of rows in the Team table",
+        "SQL": "SELECT COUNT(*) FROM `Team`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 160,
+        "db_id": "european_football_2",
+        "question": "What is the name of the country where the league with the id of 1 is located?",
+        "evidence": "The league id is given as 1, join the League and Country tables",
+        "SQL": "SELECT C.name FROM `League` L JOIN `Country` C ON L.country_id = C.id WHERE L.id = 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 161,
+        "db_id": "european_football_2",
+        "question": "What is the total number of matches played by the team with the id of 1?",
+        "evidence": "Count the number of rows in the Match table where home_team_api_id or away_team_api_id is 1",
+        "SQL": "SELECT COUNT(*) FROM `Match` WHERE home_team_api_id = 1 OR away_team_api_id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 162,
+        "db_id": "european_football_2",
+        "question": "What is the name of the player with the highest overall rating?",
+        "evidence": "Find the player with the highest overall rating in the Player_Attributes table",
+        "SQL": "SELECT P.player_name FROM `Player` P JOIN `Player_Attributes` PA ON P.player_api_id = PA.player_api_id ORDER BY PA.overall_rating DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 163,
+        "db_id": "european_football_2",
+        "question": "What is the total number of players with a preferred foot of 'right'?",
+        "evidence": "Count the number of rows in the Player_Attributes table where preferred_foot is 'right'",
+        "SQL": "SELECT COUNT(*) FROM `Player_Attributes` WHERE preferred_foot = 'right';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 164,
+        "db_id": "european_football_2",
+        "question": "What is the name of the team with the highest buildUpPlaySpeed?",
+        "evidence": "Find the team with the highest buildUpPlaySpeed in the Team_Attributes table",
+        "SQL": "SELECT T.team_long_name FROM `Team` T JOIN `Team_Attributes` TA ON T.team_api_id = TA.team_api_id ORDER BY TA.buildUpPlaySpeed DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 165,
+        "db_id": "european_football_2",
+        "question": "What is the total number of teams with a buildUpPlayDribbling of 'Normal'?",
+        "evidence": "Count the number of rows in the Team_Attributes table where buildUpPlayDribbling is 'Normal'",
+        "SQL": "SELECT COUNT(*) FROM `Team_Attributes` WHERE buildUpPlayDribbling = 'Normal';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 166,
+        "db_id": "european_football_2",
+        "question": "What is the name of the player with the highest sprint speed?",
+        "evidence": "Find the player with the highest sprint speed in the Player_Attributes table",
+        "SQL": "SELECT P.player_name FROM `Player` P JOIN `Player_Attributes` PA ON P.player_api_id = PA.player_api_id ORDER BY PA.sprint_speed DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 167,
+        "db_id": "european_football_2",
+        "question": "What is the total number of players with a shot power greater than 50?",
+        "evidence": "Count the number of rows in the Player_Attributes table where shot_power is greater than 50",
+        "SQL": "SELECT COUNT(*) FROM `Player_Attributes` WHERE shot_power > 50;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 168,
+        "db_id": "european_football_2",
+        "question": "What is the name of the team with the highest defencePressure?",
+        "evidence": "Find the team with the highest defencePressure in the Team_Attributes table",
+        "SQL": "SELECT T.team_long_name FROM `Team` T JOIN `Team_Attributes` TA ON T.team_api_id = TA.team_api_id ORDER BY TA.defencePressure DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 169,
+        "db_id": "european_football_2",
+        "question": "What is the total number of teams with a defenceAggression of 'Press'?",
+        "evidence": "Count the number of rows in the Team_Attributes table where defenceAggression is 'Press'",
+        "SQL": "SELECT COUNT(*) FROM `Team_Attributes` WHERE defenceAggression = 'Press';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 170,
+        "db_id": "european_football_2",
+        "question": "What is the name of the player with the highest overall rating in the 2008/2009 season?",
+        "evidence": "Find the player with the highest overall rating in the Player_Attributes table where date is in the 2008/2009 season",
+        "SQL": "SELECT P.player_name FROM `Player` P JOIN `Player_Attributes` PA ON P.player_api_id = PA.player_api_id WHERE PA.date BETWEEN '2008-07-01' AND '2009-06-30' ORDER BY PA.overall_rating DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 171,
+        "db_id": "european_football_2",
+        "question": "What is the total number of players with a preferred foot of 'left' in the 2008/2009 season?",
+        "evidence": "Count the number of rows in the Player_Attributes table where preferred_foot is 'left' and date is in the 2008/2009 season",
+        "SQL": "SELECT COUNT(*) FROM `Player_Attributes` WHERE preferred_foot = 'left' AND date BETWEEN '2008-07-01' AND '2009-06-30';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 172,
+        "db_id": "european_football_2",
+        "question": "What is the name of the team with the highest buildUpPlaySpeed in the 2008/2009 season?",
+        "evidence": "Find the team with the highest buildUpPlaySpeed in the Team_Attributes table where date is in the 2008/2009 season",
+        "SQL": "SELECT T.team_long_name FROM `Team` T JOIN `Team_Attributes` TA ON T.team_api_id = TA.team_api_id WHERE TA.date BETWEEN '2008-07-01' AND '2009-06-30' ORDER BY TA.buildUpPlaySpeed DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 173,
+        "db_id": "european_football_2",
+        "question": "What is the total number of teams with a buildUpPlayDribbling of 'Normal' in the 2008/2009 season?",
+        "evidence": "Count the number of rows in the Team_Attributes table where buildUpPlayDribbling is 'Normal' and date is in the 2008/2009 season",
+        "SQL": "SELECT COUNT(*) FROM `Team_Attributes` WHERE buildUpPlayDribbling = 'Normal' AND date BETWEEN '2008-07-01' AND '2009-06-30';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 174,
+        "db_id": "european_football_2",
+        "question": "What is the name of the player with the highest sprint speed in the 2008/2009 season?",
+        "evidence": "Find the player with the highest sprint speed in the Player_Attributes table where date is in the 2008/2009 season",
+        "SQL": "SELECT P.player_name FROM `Player` P JOIN `Player_Attributes` PA ON P.player_api_id = PA.player_api_id WHERE PA.date BETWEEN '2008-07-01' AND '2009-06-30' ORDER BY PA.sprint_speed DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 175,
+        "db_id": "european_football_2",
+        "question": "What is the total number of players with a shot power greater than 50 in the 2008/2009 season?",
+        "evidence": "Count the number of rows in the Player_Attributes table where shot_power is greater than 50 and date is in the 2008/2009 season",
+        "SQL": "SELECT COUNT(*) FROM `Player_Attributes` WHERE shot_power > 50 AND date BETWEEN '2008-07-01' AND '2009-06-30';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 176,
+        "db_id": "european_football_2",
+        "question": "What is the name of the team with the highest defencePressure in the 2008/2009 season?",
+        "evidence": "Find the team with the highest defencePressure in the Team_Attributes table where date is in the 2008/2009 season",
+        "SQL": "SELECT T.team_long_name FROM `Team` T JOIN `Team_Attributes` TA ON T.team_api_id = TA.team_api_id WHERE TA.date BETWEEN '2008-07-01' AND '2009-06-30' ORDER BY TA.defencePressure DESC LIMIT 1;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 177,
+        "db_id": "european_football_2",
+        "question": "What is the total number of teams with a defenceAggression of 'Press' in the 2008/2009 season?",
+        "evidence": "Count the number of rows in the Team_Attributes table where defenceAggression is 'Press' and date is in the 2008/2009 season",
+        "SQL": "SELECT COUNT(*) FROM `Team_Attributes` WHERE defenceAggression = 'Press' AND date BETWEEN '2008-07-01' AND '2009-06-30';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 178,
+        "db_id": "stackexchange",
+        "question": "What is the total number of posts made by users with a reputation of over 1000?",
+        "evidence": "Reputation = 1000, PostTypeId = 1",
+        "SQL": "SELECT COUNT(`Id`) FROM `posts` WHERE `OwnerUserId` IN (SELECT `Id` FROM `users` WHERE `Reputation` > 1000);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 179,
+        "db_id": "stackexchange",
+        "question": "What are the top 5 most common tags used in posts?",
+        "evidence": "TagName, Count",
+        "SQL": "SELECT `TagName`, `Count` FROM `tags` ORDER BY `Count` DESC LIMIT 5;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 180,
+        "db_id": "stackexchange",
+        "question": "What is the average score of posts made by users with a reputation of over 5000?",
+        "evidence": "Reputation = 5000, Score",
+        "SQL": "SELECT AVG(`Score`) FROM `posts` WHERE `OwnerUserId` IN (SELECT `Id` FROM `users` WHERE `Reputation` > 5000);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 181,
+        "db_id": "stackexchange",
+        "question": "What is the total number of comments made by users with a reputation of over 10000?",
+        "evidence": "Reputation = 10000, CommentCount",
+        "SQL": "SELECT COUNT(`Id`) FROM `comments` WHERE `UserId` IN (SELECT `Id` FROM `users` WHERE `Reputation` > 10000);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 182,
+        "db_id": "stackexchange",
+        "question": "What are the top 3 most viewed posts?",
+        "evidence": "ViewCount",
+        "SQL": "SELECT `Id`, `Title`, `ViewCount` FROM `posts` ORDER BY `ViewCount` DESC LIMIT 3;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 183,
+        "db_id": "stackexchange",
+        "question": "What is the total number of badges awarded to users with a reputation of over 500?",
+        "evidence": "Reputation = 500, Name",
+        "SQL": "SELECT COUNT(`Id`) FROM `badges` WHERE `UserId` IN (SELECT `Id` FROM `users` WHERE `Reputation` > 500);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 184,
+        "db_id": "stackexchange",
+        "question": "What is the average reputation of users who have posted at least 10 times?",
+        "evidence": "PostCount = 10, Reputation",
+        "SQL": "SELECT AVG(`Reputation`) FROM `users` WHERE `Id` IN (SELECT `OwnerUserId` FROM `posts` GROUP BY `OwnerUserId` HAVING COUNT(`Id`) >= 10);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 185,
+        "db_id": "stackexchange",
+        "question": "What are the top 5 most active users in terms of posting?",
+        "evidence": "PostCount",
+        "SQL": "SELECT `Id`, `DisplayName`, COUNT(`Id`) AS `PostCount` FROM `posts` GROUP BY `OwnerUserId` ORDER BY `PostCount` DESC LIMIT 5;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 186,
+        "db_id": "stackexchange",
+        "question": "What is the total number of posts that have been closed?",
+        "evidence": "ClosedDate",
+        "SQL": "SELECT COUNT(`Id`) FROM `posts` WHERE `ClosedDate` IS NOT NULL;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 187,
+        "db_id": "stackexchange",
+        "question": "What is the average score of posts that have been closed?",
+        "evidence": "ClosedDate, Score",
+        "SQL": "SELECT AVG(`Score`) FROM `posts` WHERE `ClosedDate` IS NOT NULL;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 188,
+        "db_id": "stackexchange",
+        "question": "What are the top 3 most common words used in post titles?",
+        "evidence": "Title",
+        "SQL": "SELECT `word`, COUNT(`word`) AS `frequency` FROM (SELECT explode(SPLIT(`Title`, ' ')) AS `word` FROM `posts`) AS `words` GROUP BY `word` ORDER BY `frequency` DESC LIMIT 3;",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 189,
+        "db_id": "stackexchange",
+        "question": "What is the total number of users who have posted at least once?",
+        "evidence": "PostCount = 1",
+        "SQL": "SELECT COUNT(DISTINCT `OwnerUserId`) FROM `posts`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 190,
+        "db_id": "stackexchange",
+        "question": "What is the average reputation of users who have been awarded at least one badge?",
+        "evidence": "BadgeCount = 1, Reputation",
+        "SQL": "SELECT AVG(`Reputation`) FROM `users` WHERE `Id` IN (SELECT `UserId` FROM `badges`);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 191,
+        "db_id": "stackexchange",
+        "question": "What are the top 5 most viewed tags?",
+        "evidence": "ViewCount, TagName",
+        "SQL": "SELECT `TagName`, `Count` FROM `tags` ORDER BY `Count` DESC LIMIT 5;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 192,
+        "db_id": "stackexchange",
+        "question": "What is the total number of comments made by users with a reputation of over 1000?",
+        "evidence": "Reputation = 1000, CommentCount",
+        "SQL": "SELECT COUNT(`Id`) FROM `comments` WHERE `UserId` IN (SELECT `Id` FROM `users` WHERE `Reputation` > 1000);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 193,
+        "db_id": "stackexchange",
+        "question": "What is the average score of posts that have been edited at least once?",
+        "evidence": "LastEditDate, Score",
+        "SQL": "SELECT AVG(`Score`) FROM `posts` WHERE `LastEditDate` IS NOT NULL;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 194,
+        "db_id": "stackexchange",
+        "question": "What are the top 3 most active editors in terms of post editing?",
+        "evidence": "LastEditorUserId, EditCount",
+        "SQL": "SELECT `LastEditorUserId`, COUNT(`Id`) AS `EditCount` FROM `posts` WHERE `LastEditDate` IS NOT NULL GROUP BY `LastEditorUserId` ORDER BY `EditCount` DESC LIMIT 3;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 195,
+        "db_id": "stackexchange",
+        "question": "What is the total number of posts that have been favorited at least once?",
+        "evidence": "FavoriteCount = 1",
+        "SQL": "SELECT COUNT(`Id`) FROM `posts` WHERE `FavoriteCount` > 0;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 196,
+        "db_id": "stackexchange",
+        "question": "What is the average reputation of users who have favorited at least one post?",
+        "evidence": "FavoriteCount = 1, Reputation",
+        "SQL": "SELECT AVG(`Reputation`) FROM `users` WHERE `Id` IN (SELECT `OwnerUserId` FROM `posts` WHERE `FavoriteCount` > 0);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 197,
+        "db_id": "stackexchange",
+        "question": "What are the top 5 most common words used in post bodies?",
+        "evidence": "Body",
+        "SQL": "SELECT `word`, COUNT(`word`) AS `frequency` FROM (SELECT explode(SPLIT(`Body`, ' ')) AS `word` FROM `posts`) AS `words` GROUP BY `word` ORDER BY `frequency` DESC LIMIT 5;",
+        "difficulty": "challenge"
+    },
+    {
+        "question_id": 198,
+        "db_id": "stackexchange",
+        "question": "What is the total number of users who have been awarded at least one badge?",
+        "evidence": "BadgeCount = 1",
+        "SQL": "SELECT COUNT(DISTINCT `UserId`) FROM `badges`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 199,
+        "db_id": "stackexchange",
+        "question": "What is the average score of posts that have been answered at least once?",
+        "evidence": "AnswerCount = 1, Score",
+        "SQL": "SELECT AVG(`Score`) FROM `posts` WHERE `AnswerCount` > 0;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 200,
+        "db_id": "stackexchange",
+        "question": "What are the top 5 most active users in terms of commenting?",
+        "evidence": "CommentCount",
+        "SQL": "SELECT `UserId`, COUNT(`Id`) AS `CommentCount` FROM `comments` GROUP BY `UserId` ORDER BY `CommentCount` DESC LIMIT 5;",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 201,
+        "db_id": "stackexchange",
+        "question": "What is the total number of posts that have been voted on at least once?",
+        "evidence": "VoteTypeId = 2",
+        "SQL": "SELECT COUNT(DISTINCT `PostId`) FROM `votes`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 202,
+        "db_id": "stackexchange",
+        "question": "What is the average reputation of users who have voted at least once?",
+        "evidence": "VoteTypeId = 2, Reputation",
+        "SQL": "SELECT AVG(`Reputation`) FROM `users` WHERE `Id` IN (SELECT `UserId` FROM `votes`);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 203,
+        "db_id": "superhero",
+        "question": "What is the total number of superheroes in the database?",
+        "evidence": "Count the total number of rows in the superhero table",
+        "SQL": "SELECT COUNT(id) FROM `superhero`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 204,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the highest intelligence attribute value?",
+        "evidence": "Find the superhero with the maximum intelligence attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 1 ORDER BY attribute_value DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 205,
+        "db_id": "superhero",
+        "question": "What is the average height of all superheroes?",
+        "evidence": "Calculate the average height of all superheroes",
+        "SQL": "SELECT AVG(height_cm) FROM `superhero`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 206,
+        "db_id": "superhero",
+        "question": "What is the name of the publisher that published the most superheroes?",
+        "evidence": "Find the publisher with the most superheroes",
+        "SQL": "SELECT `publisher_name` FROM `publisher` WHERE id = (SELECT publisher_id FROM `superhero` GROUP BY publisher_id ORDER BY COUNT(id) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 207,
+        "db_id": "superhero",
+        "question": "What is the total number of superpowers in the database?",
+        "evidence": "Count the total number of rows in the superpower table",
+        "SQL": "SELECT COUNT(id) FROM `superpower`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 208,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the most superpowers?",
+        "evidence": "Find the superhero with the most superpowers",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_power` GROUP BY hero_id ORDER BY COUNT(power_id) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 209,
+        "db_id": "superhero",
+        "question": "What is the average weight of all superheroes?",
+        "evidence": "Calculate the average weight of all superheroes",
+        "SQL": "SELECT AVG(weight_kg) FROM `superhero`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 210,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the highest strength attribute value?",
+        "evidence": "Find the superhero with the maximum strength attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 2 ORDER BY attribute_value DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 211,
+        "db_id": "superhero",
+        "question": "What is the total number of alignments in the database?",
+        "evidence": "Count the total number of rows in the alignment table",
+        "SQL": "SELECT COUNT(id) FROM `alignment`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 212,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the highest speed attribute value?",
+        "evidence": "Find the superhero with the maximum speed attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 3 ORDER BY attribute_value DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 213,
+        "db_id": "superhero",
+        "question": "What is the average intelligence attribute value of all superheroes?",
+        "evidence": "Calculate the average intelligence attribute value of all superheroes",
+        "SQL": "SELECT AVG(attribute_value) FROM `hero_attribute` WHERE attribute_id = 1;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 214,
+        "db_id": "superhero",
+        "question": "What is the name of the publisher that published the least number of superheroes?",
+        "evidence": "Find the publisher with the least number of superheroes",
+        "SQL": "SELECT `publisher_name` FROM `publisher` WHERE id = (SELECT publisher_id FROM `superhero` GROUP BY publisher_id ORDER BY COUNT(id) ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 215,
+        "db_id": "superhero",
+        "question": "What is the total number of attributes in the database?",
+        "evidence": "Count the total number of rows in the attribute table",
+        "SQL": "SELECT COUNT(id) FROM `attribute`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 216,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the lowest intelligence attribute value?",
+        "evidence": "Find the superhero with the minimum intelligence attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 1 ORDER BY attribute_value ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 217,
+        "db_id": "superhero",
+        "question": "What is the average strength attribute value of all superheroes?",
+        "evidence": "Calculate the average strength attribute value of all superheroes",
+        "SQL": "SELECT AVG(attribute_value) FROM `hero_attribute` WHERE attribute_id = 2;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 218,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the lowest strength attribute value?",
+        "evidence": "Find the superhero with the minimum strength attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 2 ORDER BY attribute_value ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 219,
+        "db_id": "superhero",
+        "question": "What is the total number of colours in the database?",
+        "evidence": "Count the total number of rows in the colour table",
+        "SQL": "SELECT COUNT(id) FROM `colour`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 220,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the highest speed attribute value?",
+        "evidence": "Find the superhero with the maximum speed attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 3 ORDER BY attribute_value DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 221,
+        "db_id": "superhero",
+        "question": "What is the average speed attribute value of all superheroes?",
+        "evidence": "Calculate the average speed attribute value of all superheroes",
+        "SQL": "SELECT AVG(attribute_value) FROM `hero_attribute` WHERE attribute_id = 3;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 222,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the lowest speed attribute value?",
+        "evidence": "Find the superhero with the minimum speed attribute value",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` WHERE attribute_id = 3 ORDER BY attribute_value ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 223,
+        "db_id": "superhero",
+        "question": "What is the total number of genders in the database?",
+        "evidence": "Count the total number of rows in the gender table",
+        "SQL": "SELECT COUNT(id) FROM `gender`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 224,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the most attributes?",
+        "evidence": "Find the superhero with the most attributes",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` GROUP BY hero_id ORDER BY COUNT(attribute_id) DESC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 225,
+        "db_id": "superhero",
+        "question": "What is the average number of attributes per superhero?",
+        "evidence": "Calculate the average number of attributes per superhero",
+        "SQL": "SELECT AVG(num_attributes) FROM (SELECT hero_id, COUNT(attribute_id) AS num_attributes FROM `hero_attribute` GROUP BY hero_id);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 226,
+        "db_id": "superhero",
+        "question": "What is the name of the superhero with the least number of attributes?",
+        "evidence": "Find the superhero with the least number of attributes",
+        "SQL": "SELECT `superhero_name` FROM `superhero` WHERE id = (SELECT hero_id FROM `hero_attribute` GROUP BY hero_id ORDER BY COUNT(attribute_id) ASC LIMIT 1);",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 227,
+        "db_id": "superhero",
+        "question": "What is the total number of races in the database?",
+        "evidence": "Count the total number of rows in the race table",
+        "SQL": "SELECT COUNT(id) FROM `race`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 228,
+        "db_id": "california_schools",
+        "question": "What is the total number of schools in Alameda County?",
+        "evidence": "Total number of schools = COUNT(`CDSCode`) WHERE `County` = 'Alameda'",
+        "SQL": "SELECT COUNT(`CDSCode`) FROM `schools` WHERE `County` = 'Alameda';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 229,
+        "db_id": "california_schools",
+        "question": "What is the average SAT score for schools in Alameda County?",
+        "evidence": "Average SAT score = AVG(`AvgScrRead`) WHERE `cname` = 'Alameda'",
+        "SQL": "SELECT AVG(`AvgScrRead`) FROM `satscores` WHERE `cname` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 230,
+        "db_id": "california_schools",
+        "question": "What is the total enrollment for schools in Alameda County?",
+        "evidence": "Total enrollment = SUM(`Enrollment (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`Enrollment (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 231,
+        "db_id": "california_schools",
+        "question": "What is the number of charter schools in Alameda County?",
+        "evidence": "Number of charter schools = COUNT(`CDSCode`) WHERE `Charter` = 1 AND `County` = 'Alameda'",
+        "SQL": "SELECT COUNT(`CDSCode`) FROM `schools` WHERE `Charter` = 1 AND `County` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 232,
+        "db_id": "california_schools",
+        "question": "What is the average free meal count for schools in Alameda County?",
+        "evidence": "Average free meal count = AVG(`Free Meal Count (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Free Meal Count (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 233,
+        "db_id": "california_schools",
+        "question": "What is the total number of students eligible for free meals in Alameda County?",
+        "evidence": "Total number of students eligible for free meals = SUM(`Free Meal Count (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`Free Meal Count (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 234,
+        "db_id": "california_schools",
+        "question": "What is the average percentage of students eligible for free meals in Alameda County?",
+        "evidence": "Average percentage of students eligible for free meals = AVG(`Percent (%) Eligible Free (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Percent (%) Eligible Free (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 235,
+        "db_id": "california_schools",
+        "question": "What is the total number of schools with a SAT score above 500 in Alameda County?",
+        "evidence": "Total number of schools with a SAT score above 500 = COUNT(`cds`) WHERE `AvgScrRead` > 500 AND `cname` = 'Alameda'",
+        "SQL": "SELECT COUNT(`cds`) FROM `satscores` WHERE `AvgScrRead` > 500 AND `cname` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 236,
+        "db_id": "california_schools",
+        "question": "What is the average enrollment for high schools in Alameda County?",
+        "evidence": "Average enrollment for high schools = AVG(`Enrollment (K-12)`) WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Enrollment (K-12)`) FROM `frpm` WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 237,
+        "db_id": "california_schools",
+        "question": "What is the total number of students eligible for FRPM in Alameda County?",
+        "evidence": "Total number of students eligible for FRPM = SUM(`FRPM Count (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`FRPM Count (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 238,
+        "db_id": "california_schools",
+        "question": "What is the average percentage of students eligible for FRPM in Alameda County?",
+        "evidence": "Average percentage of students eligible for FRPM = AVG(`Percent (%) Eligible FRPM (K-12)`) WHERE `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Percent (%) Eligible FRPM (K-12)`) FROM `frpm` WHERE `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 239,
+        "db_id": "california_schools",
+        "question": "What is the total number of schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Total number of schools with a charter funding type of 'Directly funded' = COUNT(`CDSCode`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT COUNT(`CDSCode`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 240,
+        "db_id": "california_schools",
+        "question": "What is the average SAT score for high schools in Alameda County?",
+        "evidence": "Average SAT score for high schools = AVG(`AvgScrRead`) WHERE `rtype` = 'S' AND `dname` = 'Alameda County Office of Education'",
+        "SQL": "SELECT AVG(`AvgScrRead`) FROM `satscores` WHERE `rtype` = 'S' AND `dname` = 'Alameda County Office of Education';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 241,
+        "db_id": "california_schools",
+        "question": "What is the total number of students enrolled in schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Total number of students enrolled in schools with a charter funding type of 'Directly funded' = SUM(`Enrollment (K-12)`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`Enrollment (K-12)`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 242,
+        "db_id": "california_schools",
+        "question": "What is the average free meal count for high schools in Alameda County?",
+        "evidence": "Average free meal count for high schools = AVG(`Free Meal Count (K-12)`) WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Free Meal Count (K-12)`) FROM `frpm` WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 243,
+        "db_id": "california_schools",
+        "question": "What is the total number of schools with a SAT score below 400 in Alameda County?",
+        "evidence": "Total number of schools with a SAT score below 400 = COUNT(`cds`) WHERE `AvgScrRead` < 400 AND `cname` = 'Alameda'",
+        "SQL": "SELECT COUNT(`cds`) FROM `satscores` WHERE `AvgScrRead` < 400 AND `cname` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 244,
+        "db_id": "california_schools",
+        "question": "What is the average enrollment for schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Average enrollment for schools with a charter funding type of 'Directly funded' = AVG(`Enrollment (K-12)`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Enrollment (K-12)`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 245,
+        "db_id": "california_schools",
+        "question": "What is the total number of students eligible for free meals in high schools in Alameda County?",
+        "evidence": "Total number of students eligible for free meals in high schools = SUM(`Free Meal Count (K-12)`) WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`Free Meal Count (K-12)`) FROM `frpm` WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 246,
+        "db_id": "california_schools",
+        "question": "What is the average percentage of students eligible for FRPM in high schools in Alameda County?",
+        "evidence": "Average percentage of students eligible for FRPM in high schools = AVG(`Percent (%) Eligible FRPM (K-12)`) WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Percent (%) Eligible FRPM (K-12)`) FROM `frpm` WHERE `School Type` = 'High Schools (Public)' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 247,
+        "db_id": "california_schools",
+        "question": "What is the total number of schools with a charter school number of '0728' in Alameda County?",
+        "evidence": "Total number of schools with a charter school number of '0728' = COUNT(`CDSCode`) WHERE `Charter School Number` = '0728' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT COUNT(`CDSCode`) FROM `frpm` WHERE `Charter School Number` = '0728' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 248,
+        "db_id": "california_schools",
+        "question": "What is the average SAT score for schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Average SAT score for schools with a charter funding type of 'Directly funded' = AVG(`AvgScrRead`) WHERE `Charter Funding Type` = 'Directly funded' AND `cname` = 'Alameda'",
+        "SQL": "SELECT AVG(`AvgScrRead`) FROM `satscores` WHERE `Charter Funding Type` = 'Directly funded' AND `cname` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 249,
+        "db_id": "california_schools",
+        "question": "What is the total number of students enrolled in high schools with a SAT score above 500 in Alameda County?",
+        "evidence": "Total number of students enrolled in high schools with a SAT score above 500 = SUM(`Enrollment (K-12)`) WHERE `School Type` = 'High Schools (Public)' AND `AvgScrRead` > 500 AND `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`Enrollment (K-12)`) FROM `frpm` WHERE `School Type` = 'High Schools (Public)' AND `AvgScrRead` > 500 AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 250,
+        "db_id": "california_schools",
+        "question": "What is the average free meal count for schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Average free meal count for schools with a charter funding type of 'Directly funded' = AVG(`Free Meal Count (K-12)`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Free Meal Count (K-12)`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 251,
+        "db_id": "california_schools",
+        "question": "What is the total number of students eligible for FRPM in schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Total number of students eligible for FRPM in schools with a charter funding type of 'Directly funded' = SUM(`FRPM Count (K-12)`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT SUM(`FRPM Count (K-12)`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 252,
+        "db_id": "california_schools",
+        "question": "What is the average percentage of students eligible for free meals in schools with a charter funding type of 'Directly funded' in Alameda County?",
+        "evidence": "Average percentage of students eligible for free meals in schools with a charter funding type of 'Directly funded' = AVG(`Percent (%) Eligible Free (K-12)`) WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda'",
+        "SQL": "SELECT AVG(`Percent (%) Eligible Free (K-12)`) FROM `frpm` WHERE `Charter Funding Type` = 'Directly funded' AND `County Name` = 'Alameda';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 253,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of aCL IgG in the Examination table?",
+        "evidence": "Average aCL IgG = AVG(`aCL IgG`) FROM `Examination`",
+        "SQL": "SELECT AVG(`aCL IgG`) FROM `Examination`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 254,
+        "db_id": "thrombosis_prediction",
+        "question": "How many patients have a diagnosis of SLE in the Patient table?",
+        "evidence": "Count of SLE patients = COUNT(*) WHERE `Diagnosis` = 'SLE' FROM `Patient`",
+        "SQL": "SELECT COUNT(*) FROM `Patient` WHERE `Diagnosis` = 'SLE';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 255,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the maximum value of GOT in the Laboratory table?",
+        "evidence": "Max GOT = MAX(`GOT`) FROM `Laboratory`",
+        "SQL": "SELECT MAX(`GOT`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 256,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of aCL IgM in the Examination table for patients with a diagnosis of MCTD?",
+        "evidence": "Average aCL IgM = AVG(`aCL IgM`) WHERE `Diagnosis` LIKE '%MCTD%' FROM `Examination`",
+        "SQL": "SELECT AVG(`aCL IgM`) FROM `Examination` WHERE `Diagnosis` LIKE '%MCTD%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 257,
+        "db_id": "thrombosis_prediction",
+        "question": "How many rows are in the Laboratory table for patients with an ID of 27654?",
+        "evidence": "Count of rows = COUNT(*) WHERE `ID` = 27654 FROM `Laboratory`",
+        "SQL": "SELECT COUNT(*) FROM `Laboratory` WHERE `ID` = 27654;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 258,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the minimum value of T-BIL in the Laboratory table?",
+        "evidence": "Min T-BIL = MIN(`T-BIL`) FROM `Laboratory`",
+        "SQL": "SELECT MIN(`T-BIL`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 259,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of ALP in the Laboratory table for patients with a diagnosis of PSS?",
+        "evidence": "Average ALP = AVG(`ALP`) WHERE `Diagnosis` = 'PSS' FROM `Patient` JOIN `Laboratory` ON `Patient`.`ID` = `Laboratory`.`ID`",
+        "SQL": "SELECT AVG(`ALP`) FROM `Laboratory` JOIN `Patient` ON `Laboratory`.`ID` = `Patient`.`ID` WHERE `Patient`.`Diagnosis` = 'PSS';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 260,
+        "db_id": "thrombosis_prediction",
+        "question": "How many patients have a diagnosis of AMI in the Examination table?",
+        "evidence": "Count of AMI patients = COUNT(*) WHERE `Diagnosis` LIKE '%AMI%' FROM `Examination`",
+        "SQL": "SELECT COUNT(*) FROM `Examination` WHERE `Diagnosis` LIKE '%AMI%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 261,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the maximum value of CPK in the Laboratory table?",
+        "evidence": "Max CPK = MAX(`CPK`) FROM `Laboratory`",
+        "SQL": "SELECT MAX(`CPK`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 262,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of HGB in the Laboratory table for patients with a diagnosis of SLE?",
+        "evidence": "Average HGB = AVG(`HGB`) WHERE `Diagnosis` = 'SLE' FROM `Patient` JOIN `Laboratory` ON `Patient`.`ID` = `Laboratory`.`ID`",
+        "SQL": "SELECT AVG(`HGB`) FROM `Laboratory` JOIN `Patient` ON `Laboratory`.`ID` = `Patient`.`ID` WHERE `Patient`.`Diagnosis` = 'SLE';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 263,
+        "db_id": "thrombosis_prediction",
+        "question": "How many rows are in the Examination table for patients with an ID of 14872?",
+        "evidence": "Count of rows = COUNT(*) WHERE `ID` = 14872 FROM `Examination`",
+        "SQL": "SELECT COUNT(*) FROM `Examination` WHERE `ID` = 14872;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 264,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the minimum value of PLT in the Laboratory table?",
+        "evidence": "Min PLT = MIN(`PLT`) FROM `Laboratory`",
+        "SQL": "SELECT MIN(`PLT`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 265,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of aCL IgA in the Examination table for patients with a diagnosis of MCTD?",
+        "evidence": "Average aCL IgA = AVG(`aCL IgA`) WHERE `Diagnosis` LIKE '%MCTD%' FROM `Examination`",
+        "SQL": "SELECT AVG(`aCL IgA`) FROM `Examination` WHERE `Diagnosis` LIKE '%MCTD%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 266,
+        "db_id": "thrombosis_prediction",
+        "question": "How many patients have a diagnosis of PSS in the Patient table?",
+        "evidence": "Count of PSS patients = COUNT(*) WHERE `Diagnosis` = 'PSS' FROM `Patient`",
+        "SQL": "SELECT COUNT(*) FROM `Patient` WHERE `Diagnosis` = 'PSS';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 267,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the maximum value of T-CHO in the Laboratory table?",
+        "evidence": "Max T-CHO = MAX(`T-CHO`) FROM `Laboratory`",
+        "SQL": "SELECT MAX(`T-CHO`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 268,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of ALB in the Laboratory table for patients with a diagnosis of RA?",
+        "evidence": "Average ALB = AVG(`ALB`) WHERE `Diagnosis` = 'RA' FROM `Patient` JOIN `Laboratory` ON `Patient`.`ID` = `Laboratory`.`ID`",
+        "SQL": "SELECT AVG(`ALB`) FROM `Laboratory` JOIN `Patient` ON `Laboratory`.`ID` = `Patient`.`ID` WHERE `Patient`.`Diagnosis` = 'RA';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 269,
+        "db_id": "thrombosis_prediction",
+        "question": "How many rows are in the Patient table for patients with a diagnosis of SLE?",
+        "evidence": "Count of rows = COUNT(*) WHERE `Diagnosis` = 'SLE' FROM `Patient`",
+        "SQL": "SELECT COUNT(*) FROM `Patient` WHERE `Diagnosis` = 'SLE';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 270,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the minimum value of UN in the Laboratory table?",
+        "evidence": "Min UN = MIN(`UN`) FROM `Laboratory`",
+        "SQL": "SELECT MIN(`UN`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 271,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of aCL IgG in the Examination table for patients with a diagnosis of AMI?",
+        "evidence": "Average aCL IgG = AVG(`aCL IgG`) WHERE `Diagnosis` LIKE '%AMI%' FROM `Examination`",
+        "SQL": "SELECT AVG(`aCL IgG`) FROM `Examination` WHERE `Diagnosis` LIKE '%AMI%';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 272,
+        "db_id": "thrombosis_prediction",
+        "question": "How many patients have a diagnosis of MCTD in the Examination table?",
+        "evidence": "Count of MCTD patients = COUNT(*) WHERE `Diagnosis` LIKE '%MCTD%' FROM `Examination`",
+        "SQL": "SELECT COUNT(*) FROM `Examination` WHERE `Diagnosis` LIKE '%MCTD%';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 273,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the maximum value of GLU in the Laboratory table?",
+        "evidence": "Max GLU = MAX(`GLU`) FROM `Laboratory`",
+        "SQL": "SELECT MAX(`GLU`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 274,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of HCT in the Laboratory table for patients with a diagnosis of PSS?",
+        "evidence": "Average HCT = AVG(`HCT`) WHERE `Diagnosis` = 'PSS' FROM `Patient` JOIN `Laboratory` ON `Patient`.`ID` = `Laboratory`.`ID`",
+        "SQL": "SELECT AVG(`HCT`) FROM `Laboratory` JOIN `Patient` ON `Laboratory`.`ID` = `Patient`.`ID` WHERE `Patient`.`Diagnosis` = 'PSS';",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 275,
+        "db_id": "thrombosis_prediction",
+        "question": "How many rows are in the Laboratory table for patients with an ID of 27654 and a date of 1991-09-11?",
+        "evidence": "Count of rows = COUNT(*) WHERE `ID` = 27654 AND `Date` = '1991-09-11' FROM `Laboratory`",
+        "SQL": "SELECT COUNT(*) FROM `Laboratory` WHERE `ID` = 27654 AND `Date` = '1991-09-11';",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 276,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the minimum value of CRP in the Laboratory table?",
+        "evidence": "Min CRP = MIN(`CRP`) FROM `Laboratory`",
+        "SQL": "SELECT MIN(`CRP`) FROM `Laboratory`;",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 277,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the average value of aCL IgM in the Examination table for patients with a diagnosis of SLE?",
+        "evidence": "Average aCL IgM = AVG(`aCL IgM`) WHERE `Diagnosis` LIKE '%SLE%' FROM `Examination`",
+        "SQL": "SELECT AVG(`aCL IgM`) FROM `Examination` WHERE `Diagnosis` LIKE '%SLE%';",
+        "difficulty": "moderate"
+    }
+]

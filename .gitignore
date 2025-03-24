@@ -1,0 +1,150 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.sql
+
+# Chroma db files
+*.bin
+*.pickle
+chroma.sqlite3
+
+# Model files
+*.h5
+*.onnx
+*.pt
+*.pth
+*.weights
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+*.iws
+.idea/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Log files
+*.log
+
+# Temporary files
+*.swp
+*.swo
+*.tmp
+*.bak
+*.backup
+*~
+
+# API keys and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+env 
+
+# Output files
+outputs/*
+!outputs/.gitkeep
+!outputs/dev.json 
+!outputs/dev_gold.sql
+
+# Large data files
+*.zip
+*.tar.gz
+*.gz
+*.rar
+*.7z
+
+# Cache directories
+.cache/
+.caches/
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Project-specific files and directories
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# BIRD dev folder
+dev_folder
