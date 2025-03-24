@@ -30,18 +30,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Database files
-*.sqlite
-*.sqlite-shm
-*.sqlite-wal
-*.db
-*.sql
-
-# Chroma db files
-*.bin
-*.pickle
-chroma.sqlite3
-
 # Model files
 *.h5
 *.onnx
@@ -117,13 +105,8 @@ $RECYCLE.BIN/
 .env.development.local
 .env.test.local
 .env.production.local
-env 
 
-# Output files
-outputs/*
-!outputs/.gitkeep
-!outputs/dev.json 
-!outputs/dev_gold.sql
+
 
 # Large data files
 *.zip
