@@ -132,30 +132,34 @@ if __name__ == '__main__':
         print(f"Batch progress: {progress:.1f}% ({i-args.start+1}/{args.end-args.start})")
         print(f"Overall progress: {(i + 1) / len(question_list) * 100:.1f}% ({i+1}/{len(question_list)})")
     
-    # Create final output in BIRD format if needed
-    # Automatically create BIRD format for small batches
-    create_bird_format = args.end >= len(question_list) or args.end - args.start <= 10
-    
-    if create_bird_format:
-        try:
-            # Convert only this batch's results to ordered list with BIRD format
-            responses = []
-            for i in range(args.start, args.end):
-                if str(i) in results:
-                    responses.append((i, results[str(i)] + '\t----- bird -----\t' + db_name_list[i]))
-                else:
-                    # Skip questions that haven't been processed successfully in this batch
-                    print(f"Warning: No result for question {i} in this batch")
-                    pass
-            
-            # Generate final output file
-            bird_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}_bird4.json")
-            utils.generate_sql_file(responses, bird_file, append=args.append)
-            print(f"✅ BIRD format results saved to {bird_file}")
-        except Exception as e:
-            print(f"Error creating BIRD format output: {e}")
-    else:
-        print("Skipping BIRD format creation for this batch. It will be created when processing is complete.")
+    # Always generate BIRD format for all processed entries so far
+    try:
+        # Convert ALL processed results to BIRD format
+        bird_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}_bird4.json")
+        
+        # First, load existing BIRD format results if appending
+        existing_bird_results = {}
+        if args.append and os.path.exists(bird_file):
+            try:
+                with open(bird_file, 'r') as f:
+                    existing_bird_results = json.load(f)
+                print(f"Loaded {len(existing_bird_results)} existing BIRD format results")
+            except Exception as e:
+                print(f"Error loading existing BIRD results: {e}")
+        
+        # Convert ALL processed results to ordered list with BIRD format
+        responses = []
+        # Process all entries that have been processed so far
+        for i in range(len(question_list)):
+            if str(i) in results:
+                responses.append((i, results[str(i)] + '\t----- bird -----\t' + db_name_list[i]))
+        
+        # Generate final output file
+        utils.generate_sql_file(responses, bird_file, append=False)  # Always overwrite with complete results
+        print(f"✅ BIRD format results saved to {bird_file}")
+    except Exception as e:
+        print(f"Error creating BIRD format output: {e}")
+        print(traceback.format_exc())
     
     print(f"✅ Batch processing complete! Raw results saved to {output_file}")
     print("\nTo continue processing the next batch, run:")
