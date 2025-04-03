@@ -4,6 +4,7 @@ import sqlite3
 import os
 import json
 import anthropic
+from typing import List, Dict, Any, Optional
 
 from langchain_community.utilities import SQLDatabase
 from sqlalchemy import create_engine
@@ -13,6 +14,15 @@ from langchain.schema import Document
 from langchain_community.document_loaders import JSONLoader
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+try:
+    from sentence_transformers import CrossEncoder, SentenceTransformer
+except ImportError:
+    logging.warning("sentence-transformers not installed. Enhanced retrieval will not be available unless package is installed.")
+    CrossEncoder = None
+    SentenceTransformer = None
 
 # Configure logging
 logging.basicConfig(
@@ -25,6 +35,7 @@ claude_client = anthropic.Anthropic()
 llm = ChatGroq(
     model="Llama-3.3-70b-Versatile",
     temperature=0.7,
+    groq_api_key="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"
 )
 
 embedding_function = OpenAIEmbeddings(model="text-embedding-ada-002")
@@ -37,6 +48,354 @@ DATABASE_DIR = os.path.join(CURRENT_DIR, "..", "database")
 CHROMA_DIR = os.path.join(DATABASE_DIR, "chroma")
 EVIDENCE_DIR = os.path.join(CHROMA_DIR, "evidence_chroma_db")
 PERSISTENT_DIR = os.path.join(CHROMA_DIR, "chroma_db")
+
+class HybridRetriever(BaseRetriever):
+    """A retriever that combines vector similarity search with keyword search."""
+    
+    def __init__(
+        self, 
+        vector_store: Chroma, 
+        k: int = 5, 
+        score_threshold: float = 0.3,
+        keyword_weight: float = 0.3
+    ):
+        """Initialize the hybrid retriever.
+        
+        Args:
+            vector_store: The vector store to use for similarity search
+            k: Number of documents to retrieve (default: 5)
+            score_threshold: Minimum similarity score (default: 0.3)
+            keyword_weight: Weight for keyword search vs vector search (default: 0.3)
+        """
+        super().__init__()
+        # Store all parameters as private attributes
+        self._vector_store = vector_store
+        self._k = k
+        self._score_threshold = score_threshold
+        self._keyword_weight = keyword_weight
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        """Get documents relevant to the query using both vector and keyword search.
+        
+        Args:
+            query: The query to search for
+            run_manager: The callback manager
+            
+        Returns:
+            List of relevant documents
+        """
+        # Vector search
+        vector_docs = self._vector_store.similarity_search_with_score(
+            query=query, k=self._k
+        )
+        
+        # Add vector score to metadata
+        for doc, score in vector_docs:
+            doc.metadata["vector_score"] = score
+            doc.metadata["keyword_score"] = 0.0
+            doc.metadata["combined_score"] = (1 - self._keyword_weight) * score
+        
+        # Keyword search (simple implementation)
+        query_keywords = set(re.findall(r'\b\w+\b', query.lower()))
+        
+        # Get all documents from the collection for keyword search
+        all_docs = self._vector_store.get()
+
+
+class EnhancedHybridRetriever(BaseRetriever):
+    """An enhanced retriever that combines vector search, keyword search, and cross-encoder reranking."""
+    
+    def __init__(
+        self, 
+        vector_store: Chroma, 
+        k: int = 5, 
+        rerank_k: int = 10,  # Retrieve more initially to rerank
+        score_threshold: float = 0.3,
+        keyword_weight: float = 0.3,
+        cross_encoder_model: str = 'cross-encoder/ms-marco-MiniLM-L-6-v2'
+    ):
+        """Initialize the enhanced hybrid retriever.
+        
+        Args:
+            vector_store: The vector store to use for similarity search
+            k: Number of final documents to retrieve (default: 5)
+            rerank_k: Number of documents to retrieve initially for reranking (default: 10)
+            score_threshold: Minimum similarity score (default: 0.3)
+            keyword_weight: Weight for keyword search vs vector search (default: 0.3)
+            cross_encoder_model: The cross-encoder model to use for reranking (default: 'cross-encoder/ms-marco-MiniLM-L-6-v2')
+        """
+        super().__init__()
+        self._vector_store = vector_store
+        self._k = k
+        self._rerank_k = rerank_k
+        self._score_threshold = score_threshold
+        self._keyword_weight = keyword_weight
+        
+        # Initialize cross-encoder for reranking
+        if CrossEncoder is not None:
+            try:
+                self._cross_encoder = CrossEncoder(cross_encoder_model)
+                logging.info(f"Initialized cross-encoder model: {cross_encoder_model}")
+            except Exception as e:
+                logging.error(f"Failed to initialize cross-encoder: {e}")
+                self._cross_encoder = None
+        else:
+            logging.warning("CrossEncoder not available. Install sentence-transformers for reranking.")
+            self._cross_encoder = None
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        """Get documents relevant to the query using enhanced hybrid retrieval.
+        
+        Args:
+            query: The query to search for
+            run_manager: The callback manager
+            
+        Returns:
+            List of reranked relevant documents
+        """
+        # Vector search - get more documents initially for reranking
+        vector_docs = self._vector_store.similarity_search_with_score(
+            query=query, k=self._rerank_k
+        )
+        
+        # Add vector score to metadata
+        for doc, score in vector_docs:
+            doc.metadata["vector_score"] = score
+            doc.metadata["keyword_score"] = 0.0
+            doc.metadata["combined_score"] = (1 - self._keyword_weight) * score
+        
+        # Keyword search (simple implementation)
+        query_keywords = set(re.findall(r'\b\w+\b', query.lower()))
+        
+        # Get all documents from the collection for keyword search
+        all_docs = self._vector_store.get()
+        
+        # Sort docs with vector scores by vector score
+        vector_docs_dict = {doc.page_content: (doc, score) for doc, score in vector_docs}
+        
+        # For each document, calculate keyword match score (similar to HybridRetriever)
+        keyword_results = []
+        for i, doc_content in enumerate(all_docs["documents"]):
+            if not doc_content:  # Skip empty documents
+                continue
+                
+            doc_text = doc_content.lower()
+            doc_keywords = set(re.findall(r'\b\w+\b', doc_text))
+            
+            # Calculate keyword match score (Jaccard similarity)
+            if not query_keywords or not doc_keywords:
+                keyword_score = 0.0
+            else:
+                intersection = len(query_keywords.intersection(doc_keywords))
+                union = len(query_keywords.union(doc_keywords))
+                keyword_score = intersection / union if union > 0 else 0.0
+            
+            # Skip documents with low keyword score
+            if keyword_score < 0.1:  # Minimum threshold for keyword matches
+                continue
+                
+            # Create document with metadata
+            metadata = all_docs["metadatas"][i] if all_docs["metadatas"] else {}
+            metadata["keyword_score"] = keyword_score
+            
+            # Check if this document is already in vector results
+            if doc_content in vector_docs_dict:
+                # Update the existing document with keyword score
+                existing_doc, vector_score = vector_docs_dict[doc_content]
+                existing_doc.metadata["keyword_score"] = keyword_score
+                existing_doc.metadata["combined_score"] = (
+                    (1 - self._keyword_weight) * vector_score + 
+                    self._keyword_weight * keyword_score
+                )
+            else:
+                # New document from keyword search
+                doc = Document(
+                    page_content=doc_content,
+                    metadata={
+                        **metadata,
+                        "vector_score": 0.0,
+                        "combined_score": self._keyword_weight * keyword_score
+                    }
+                )
+                keyword_results.append(doc)
+        
+        # Combine results from vector search and keyword search
+        all_results = [doc for doc, _ in vector_docs] + keyword_results
+        
+        # Apply cross-encoder reranking if available
+        if self._cross_encoder is not None and len(all_results) > 0:
+            # Prepare pairs for cross-encoder
+            pairs = [[query, doc.page_content] for doc in all_results]
+            
+            # Get cross-encoder scores
+            try:
+                cross_scores = self._cross_encoder.predict(pairs)
+                
+                # Add cross-encoder scores to metadata
+                for i, doc in enumerate(all_results):
+                    doc.metadata["cross_score"] = float(cross_scores[i])
+                    # Final score is a weighted combination
+                    doc.metadata["final_score"] = doc.metadata.get("combined_score", 0) * 0.3 + float(cross_scores[i]) * 0.7
+                
+                # Sort by final score
+                all_results.sort(key=lambda x: x.metadata.get("final_score", 0), reverse=True)
+                logging.info(f"Applied cross-encoder reranking to {len(all_results)} documents")
+            except Exception as e:
+                logging.error(f"Error in cross-encoder reranking: {e}")
+                # Fall back to combined scores if reranking fails
+                all_results.sort(key=lambda x: x.metadata.get("combined_score", 0), reverse=True)
+        else:
+            # Sort by combined score if no cross-encoder
+            all_results.sort(key=lambda x: x.metadata.get("combined_score", 0), reverse=True)
+        
+        # Return top k results
+        return all_results[:self._k]
+
+def decompose_complex_query(query, db_schema, llm_choice="groq"):
+    """Break down complex queries into simpler sub-queries.
+    
+    Args:
+        query: The original complex query
+        db_schema: Database schema information to help with decomposition
+        llm_choice: The LLM to use (openai, claude, or groq)
+        
+    Returns:
+        List of sub-queries
+    """
+    decomposition_prompt = f"""
+    I need to break down a complex database question into simpler sub-questions.
+    
+    Database schema:
+    {db_schema}
+    
+    Complex question: {query}
+    
+    Please break this down into 2-3 simpler sub-questions that would help answer the original question.
+    Format: JSON array of strings, each string being a simpler sub-question.
+    """
+    
+    messages = [
+        {
+            "role": "user",
+            "content": decomposition_prompt
+        }
+    ]
+    
+    # Get response from LLM
+    try:
+        if llm_choice == "openai":
+            response = OpenAI().chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                max_tokens=1024,
+                temperature=0
+            )
+            response_text = response.choices[0].message.content
+        
+        elif llm_choice == "claude":
+            response = claude_client.messages.create(
+                model="claude-3-7-sonnet-20250219",
+                temperature=0,
+                max_tokens=4000,
+                messages=messages
+            )
+            response_text = response.content[0].text
+        
+        elif llm_choice == "groq":
+            response = llm.invoke(messages)
+            if hasattr(response, "content"):
+                response_text = response.content.strip()
+            else:
+                logging.error("LLM response does not contain a valid 'content' attribute.")
+                return [query]  # Return original query if decomposition fails
+        else:
+            logging.error(f"Unsupported LLM choice: {llm_choice}")
+            return [query]  # Return original query if LLM choice is invalid
+        
+        # Try to parse as JSON
+        try:
+            sub_queries = json.loads(response_text)
+            if isinstance(sub_queries, list) and all(isinstance(q, str) for q in sub_queries):
+                logging.info(f"Successfully decomposed query into {len(sub_queries)} sub-queries")
+                return sub_queries
+        except json.JSONDecodeError:
+            # Fall back to regex if JSON parsing fails
+            sub_queries = re.findall(r'"([^"]+)"', response_text)
+            if sub_queries:
+                logging.info(f"Extracted {len(sub_queries)} sub-queries using regex")
+                return sub_queries
+        
+        # If decomposition failed, return original query
+        logging.warning("Query decomposition failed, returning original query")
+        return [query]
+    
+    except Exception as e:
+        logging.error(f"Error in query decomposition: {e}")
+        return [query]  # Return original query if any error occurs
+
+def get_improved_retrieval(query, db_name, db_schema, vector_store, use_decomposition=True, llm_choice="groq"):
+    """Get retrieved examples with query decomposition.
+    
+    Args:
+        query: The original user query
+        db_name: Database name
+        db_schema: Database schema
+        vector_store: Vector store for retrieval
+        use_decomposition: Whether to use query decomposition
+        llm_choice: LLM to use for decomposition
+        
+    Returns:
+        List of retrieved documents
+    """
+    # Initialize the enhanced hybrid retriever
+    retriever = EnhancedHybridRetriever(vector_store=vector_store, k=5, rerank_k=10)
+    
+    if not use_decomposition:
+        # Simple retrieval without decomposition
+        return retriever.get_relevant_documents(query)
+    
+    # Decompose query
+    sub_queries = decompose_complex_query(query, db_schema, llm_choice)
+    
+    # Get results for each sub-query
+    all_docs = []
+    for sub_query in sub_queries:
+        docs = retriever.get_relevant_documents(sub_query)
+        all_docs.extend(docs)
+    
+    # Remove duplicates
+    seen_contents = set()
+    unique_docs = []
+    for doc in all_docs:
+        if doc.page_content not in seen_contents:
+            seen_contents.add(doc.page_content)
+            unique_docs.append(doc)
+    
+    # Re-score based on relevance to original query
+    # Simple semantic similarity to original query
+    for doc in unique_docs:
+        # Use keyword matching for quick similarity
+        query_keywords = set(re.findall(r'\b\w+\b', query.lower()))
+        doc_keywords = set(re.findall(r'\b\w+\b', doc.page_content.lower()))
+        
+        if not query_keywords or not doc_keywords:
+            relevance = 0.0
+        else:
+            intersection = len(query_keywords.intersection(doc_keywords))
+            union = len(query_keywords.union(doc_keywords))
+            relevance = intersection / union if union > 0 else 0.0
+        
+        doc.metadata["relevance_to_original"] = relevance
+    
+    # Sort by relevance to original query
+    unique_docs.sort(key=lambda x: x.metadata.get("relevance_to_original", 0), reverse=True)
+    
+    # Take top k results
+    return unique_docs[:5]
 
 def extract_evidence():
     # Ensure DB_DIR is a directory
@@ -148,6 +507,34 @@ def generate_sql(contextual, schema: str, question: str, llm_choice="groq"):
     Returns:
         str: Generated SQL query
     """
+    # Format contextual information with relevance scores if available
+    formatted_context = ""
+    
+    if isinstance(contextual, list) and all(hasattr(doc, 'metadata') for doc in contextual):
+        # Sort documents by combined_score if available
+        contextual.sort(
+            key=lambda x: x.metadata.get("combined_score", 
+                 x.metadata.get("vector_score", 0)
+            ), 
+            reverse=True
+        )
+        
+        # Format each document with its scores
+        for i, doc in enumerate(contextual):
+            # Get scores from metadata
+            vector_score = doc.metadata.get("vector_score", "N/A")
+            keyword_score = doc.metadata.get("keyword_score", "N/A")
+            combined_score = doc.metadata.get("combined_score", "N/A")
+            
+            # Format the context with relevance information
+            if isinstance(combined_score, float):
+                formatted_context += f"\nEXAMPLE {i+1} (Relevance: {combined_score:.4f}):\n{doc.page_content}\n"
+            else:
+                formatted_context += f"\nEXAMPLE {i+1} (Relevance: {combined_score}):\n{doc.page_content}\n"
+    else:
+        # Handle the case when contextual is not a list of Documents
+        formatted_context = str(contextual)
+    
     messages = [
         {
             "role" : "assistant",
@@ -159,10 +546,11 @@ def generate_sql(contextual, schema: str, question: str, llm_choice="groq"):
                     {schema}
             
                     **Contextual Information**:
-                    {contextual}
+                    {formatted_context}
             
                     **IMPORTANT**:
                         - First, determine if the question matches the context provided or is thematically similar. If it does, generate SQL that leverages this context directly.
+                        - Pay special attention to examples with higher relevance scores.
                         - Enclose columns with spaces or special characters in double quotes.
                         - If the question does not match the context, use the schema and context as a guide to understand the data structure and generate SQL that best answers the user's question.
                         - Only use columns from the schema. Do not introduce columns not listed here.
@@ -250,13 +638,12 @@ def generate_sql_file(sql_lst, output_path=None, append=False):
     Function to save the SQL results to a file.
     
     Args:
-        sql_lst (list): List of SQL strings to save (with BIRD format)
+        sql_lst (list): List of tuples (index, sql_string) or just sql strings to save (with BIRD format)
         output_path (str): Path to save the results
         append (bool): Whether to append to existing file (default: False)
     """
     # If appending and file exists, load existing data first
     result = {}
-    start_idx = 0
     
     if append and output_path and os.path.exists(output_path):
         try:
@@ -266,27 +653,41 @@ def generate_sql_file(sql_lst, output_path=None, append=False):
             # Filter to keep only entries with BIRD delimiter
             result = {k: v for k, v in existing_data.items() if '\t----- bird -----\t' in v}
             
-            # Find the highest existing key to determine where to start numbering
-            if result:
-                # Convert string keys to integers for proper comparison
-                int_keys = [int(k) for k in result.keys() if k.isdigit()]
-                if int_keys:
-                    start_idx = max(int_keys) + 1
-            
-            print(f"Loaded {len(result)} valid entries from {output_path}, continuing from index {start_idx}")
+            print(f"Loaded {len(result)} valid entries from {output_path}")
             if len(existing_data) != len(result):
                 print(f"Removed {len(existing_data) - len(result)} entries without BIRD format")
         except Exception as e:
             print(f"Error loading existing file for append: {e}")
             print("Starting with empty results")
     
-    # Create a new result dictionary with proper indexing
-    # Ensure all entries have the BIRD format
-    for i, sql in enumerate(sql_lst):
-        if '\t----- bird -----\t' in sql:
-            result[str(start_idx + i)] = sql
+    # Add new entries to the result dictionary
+    # Check if we have index information in the SQL list (tuple format)
+    entries_added = 0
+    for item in sql_lst:
+        if isinstance(item, tuple) and len(item) == 2:
+            # The item is a tuple with (index, sql_content)
+            idx, sql = item
+            if '\t----- bird -----\t' in sql:
+                result[str(idx)] = sql
+                entries_added += 1
+            else:
+                print(f"Warning: Skipping entry without BIRD format at index {idx}")
         else:
-            print(f"Warning: Skipping entry without BIRD format at index {start_idx + i}")
+            # Legacy format (just the SQL string)
+            if '\t----- bird -----\t' in item:
+                # Find the next available index if no index was provided
+                next_idx = 0
+                if result:
+                    int_keys = [int(k) for k in result.keys() if k.isdigit()]
+                    if int_keys:
+                        next_idx = max(int_keys) + 1
+                
+                result[str(next_idx)] = item
+                entries_added += 1
+            else:
+                print(f"Warning: Skipping entry without BIRD format (no index)")
+    
+    print(f"Added {entries_added} new entries to BIRD format output")
     
     # Save to file if output_path is provided
     if output_path:

@@ -1,6 +1,7 @@
 import os
 import json
 import argparse
+import sqlite3
 import anthropic
 from openai import OpenAI
 from langchain_community.utilities import SQLDatabase
@@ -83,6 +84,13 @@ def generate_sample(llm_choice, num_sample, output_dir):
             search_kwargs={"k": 3, "score_threshold": 0.5},
         )
         
+        # Define the distribution of question types and difficulty levels
+        question_types = [
+            "exact", "aggregation", "comparison", 
+            "ranking", "reasoning", "multi-table", "nested"
+        ]
+        difficulty_levels = ["simple", "moderate", "challenge"]
+        
         # Ensure DB_DIR is a directory
         if not os.path.isdir(DB_DIR):
             raise NotADirectoryError(f"DB_DIR is not a directory: {DB_DIR}")
@@ -131,13 +139,23 @@ def generate_sample(llm_choice, num_sample, output_dir):
                 **Instructions:**
                 - Generate **unique questions** in natural language using the schema and evidence.
                 - For each question, generate a corresponding **valid SQL query** based on the schema and evidence. Do not include any markdown or code block markers like ```json..
+                - Create a variety of question types:
+                    - **Exact**: Direct retrieval of specific values
+                    - **Aggregation**: Using functions like COUNT, AVG, SUM, MIN, MAX
+                    - **Comparison**: Comparing values using conditions
+                    - **Ranking**: Using ORDER BY with LIMIT to get top/bottom results
+                    - **Reasoning**: Questions requiring logical reasoning with joins or complex conditions
+                    - **Multi-table**: Questions requiring joins across multiple tables
+                    - **Nested**: Questions requiring subqueries or nested operations
+                - For each type, create questions with varying difficulties from simple to challenging
                 - Ensure the output is in JSON format with the following fields:
                     - `question_id`: A unique numeric ID for each question.
                     - `db_id`: The name of the database (e.g., "{db_name}").
                     - `question`: The question in natural language.
                     - `evidence`: Use the provided evidence to justify the SQL query.
                     - `SQL`: A valid SQL query based on the schema and evidence and wrap table name like `order`, `bond`,... .
-                    - `difficulty`: A difficulty level for the question (e.g., "simple", "moderate", "challenge").
+                    - `difficulty`: A difficulty level for the question ("simple", "moderate", "challenge").
+                    - `question_type`: The type of question (exact, aggregation, comparison, ranking, reasoning, multi-table, nested).
 
                 **Example Output:**
                 [
@@ -147,7 +165,17 @@ def generate_sample(llm_choice, num_sample, output_dir):
                         "question": "What is the total amount of money transferred from account 1 to account 2?",
                         "evidence": "Transferred amount = SUM(`amount`) WHERE `account_id` = 1 AND `account_to` = 2",
                         "SQL": "SELECT SUM(amount) FROM transactions WHERE account_id = 1 AND account_to = 2;",
-                        "difficulty": "simple"
+                        "difficulty": "simple",
+                        "question_type": "aggregation"
+                    }},
+                    {{
+                        "question_id": 1,
+                        "db_id": "{db_name}",
+                        "question": "Which customer has made the most transactions, and how many did they make?",
+                        "evidence": "Customer transactions can be counted using COUNT(*) GROUP BY customer_id",
+                        "SQL": "SELECT c.name, COUNT(*) as transaction_count FROM transactions t JOIN customers c ON t.customer_id = c.id GROUP BY t.customer_id ORDER BY transaction_count DESC LIMIT 1;",
+                        "difficulty": "challenge",
+                        "question_type": "ranking"
                     }}
                 ]
 
@@ -200,10 +228,100 @@ def generate_sample(llm_choice, num_sample, output_dir):
             # Ensure response is a valid list
             if isinstance(json_data, list) and json_data:
                 print(f"Processing {len(json_data)} questions from {db_name}")
+                
+                # Check and fix question types and difficulty levels if needed
                 for question in json_data:
-                    question["question_id"] = question_id_counter  # Assign unique ID inside each object
-                    question_id_counter += 1  # Increment counter
-                    all_questions.append(question)
+                    # Set default question_type if missing or invalid
+                    if not question.get("question_type") or question.get("question_type") not in question_types:
+                        # Guess question type based on SQL content
+                        sql = question.get("SQL", "").lower()
+                        if "sum(" in sql or "count(" in sql or "avg(" in sql or "min(" in sql or "max(" in sql:
+                            question["question_type"] = "aggregation"
+                        elif " join " in sql and "where" in sql:
+                            question["question_type"] = "multi-table"
+                        elif "order by" in sql and "limit" in sql:
+                            question["question_type"] = "ranking"
+                        elif "select" in sql and "from" in sql and "where" in sql and "select" in sql.split("where")[1]:
+                            question["question_type"] = "nested"
+                        elif ">" in sql or "<" in sql or "=" in sql:
+                            question["question_type"] = "comparison"
+                        elif " join " in sql:
+                            question["question_type"] = "reasoning"
+                        else:
+                            question["question_type"] = "exact"
+                    
+                    # Set default difficulty if missing or invalid
+                    if not question.get("difficulty") or question.get("difficulty") not in difficulty_levels:
+                        # Guess difficulty based on SQL complexity
+                        sql = question.get("SQL", "").lower()
+                        if "select" in sql and "from" in sql and "where" not in sql and "join" not in sql:
+                            question["difficulty"] = "simple"
+                        elif "join" in sql or "group by" in sql:
+                            question["difficulty"] = "moderate"
+                        elif "having" in sql or ("select" in sql and "from" in sql and "where" in sql and "select" in sql.split("where")[1]):
+                            question["difficulty"] = "challenge"
+                        elif sql.count("select") > 2 or sql.count("join") > 2:
+                            question["difficulty"] = "challenge"
+                        else:
+                            question["difficulty"] = "moderate"
+                    
+                    # Validate SQL query by executing it against the database
+                    try:
+                        print(f"Validating SQL query for question: {question.get('question_id', 'new')} - {question['question'][:50]}...")
+                        sql_query = question.get("SQL", "")
+                        conn = sqlite3.connect(db_path)
+                        cursor = conn.cursor()
+                        cursor.execute(sql_query)
+                        # Just fetch to test execution, no need to store result
+                        cursor.fetchall()
+                        conn.close()
+                        
+                        # Mark query as validated
+                        question["is_valid"] = True
+                        print(f"✅ SQL query validated successfully")
+                        
+                        # Add to our question collection
+                        question["question_id"] = question_id_counter
+                        question_id_counter += 1
+                        all_questions.append(question)
+                        
+                    except sqlite3.Error as e:
+                        print(f"❌ SQL validation error for question {question.get('question', '')[:50]}: {e}")
+                        question["is_valid"] = False
+                        question["validation_error"] = str(e)
+                        # Skip adding invalid queries to all_questions
+                
+                # Print distribution of question types, difficulty levels and validation status for this database
+                type_counts = {}
+                difficulty_counts = {}
+                validation_counts = {"valid": 0, "invalid": 0}
+                
+                # Count only questions that were processed through the validation phase
+                for q in all_questions:
+                    if q.get("db_id") == db_name:  # Only count questions from current db
+                        q_type = q.get("question_type", "unknown")
+                        difficulty = q.get("difficulty", "unknown")
+                        validation = q.get("is_valid", False)
+                        
+                        type_counts[q_type] = type_counts.get(q_type, 0) + 1
+                        difficulty_counts[difficulty] = difficulty_counts.get(difficulty, 0) + 1
+                        if validation:
+                            validation_counts["valid"] += 1
+                        else:
+                            validation_counts["invalid"] += 1
+                
+                print(f"Question type distribution for {db_name}:")
+                for q_type, count in type_counts.items():
+                    print(f"  - {q_type}: {count} questions")
+                
+                print(f"Difficulty distribution for {db_name}:")
+                for difficulty, count in difficulty_counts.items():
+                    print(f"  - {difficulty}: {count} questions")
+                    
+                print(f"Validation results for {db_name}:")
+                valid_percent = (validation_counts["valid"] / (validation_counts["valid"] + validation_counts["invalid"])) * 100 if (validation_counts["valid"] + validation_counts["invalid"]) > 0 else 0
+                print(f"  - Valid queries: {validation_counts['valid']} ({valid_percent:.1f}%)")
+                print(f"  - Invalid queries: {validation_counts['invalid']}")
             else:
                 print(f"Warning: No valid data returned for database {db_name}")
         
@@ -212,14 +330,69 @@ def generate_sample(llm_choice, num_sample, output_dir):
 
         # Check if we have any data before writing the file
         if all_questions:
-            output_file = os.path.join(output_dir, f"{llm_choice}_generated_sample.json")
+            # Generate statistics for the full dataset
+            overall_type_counts = {}
+            overall_difficulty_counts = {}
+            
+            for q in all_questions:
+                q_type = q.get("question_type", "unknown")
+                difficulty = q.get("difficulty", "unknown")
+                overall_type_counts[q_type] = overall_type_counts.get(q_type, 0) + 1
+                overall_difficulty_counts[difficulty] = overall_difficulty_counts.get(difficulty, 0) + 1
+            
+            # Count valid and invalid queries
+            valid_queries = sum(1 for q in all_questions if q.get("is_valid", False))
+            invalid_queries = sum(1 for q in all_questions if not q.get("is_valid", True))
+            
+            # Create dataset summary
+            summary = {
+                "total_questions": len(all_questions),
+                "databases_covered": len(set(q["db_id"] for q in all_questions)),
+                "question_types": overall_type_counts,
+                "difficulty_levels": overall_difficulty_counts,
+                "validation_results": {
+                    "valid_queries": valid_queries,
+                    "invalid_queries": invalid_queries,
+                    "validation_rate": (valid_queries / len(all_questions)) * 100 if all_questions else 0
+                }
+            }
+            
+            # Save questions to JSON file
+            output_file = os.path.join(output_dir, f"{llm_choice}_generated_sample3.json")
             with open(output_file, "w") as f:
                 json.dump(all_questions, f, indent=4)
-            print(f"JSON file saved successfully at: {output_file} with {len(all_questions)} questions")
+            
+            # Save summary to separate JSON file
+            summary_file = os.path.join(output_dir, f"{llm_choice}_dataset_summary.json")
+            with open(summary_file, "w") as f:
+                json.dump(summary, f, indent=4)
+                
+            # Print summary statistics
+            print("\n=== DATASET SUMMARY ===")
+            print(f"Total questions: {len(all_questions)}")
+            print(f"Databases covered: {len(set(q['db_id'] for q in all_questions))}")
+            
+            print("\nQuestion type distribution:")
+            for q_type, count in overall_type_counts.items():
+                percentage = (count / len(all_questions)) * 100
+                print(f"  - {q_type}: {count} questions ({percentage:.1f}%)")
+            
+            print("\nDifficulty distribution:")
+            for difficulty, count in overall_difficulty_counts.items():
+                percentage = (count / len(all_questions)) * 100
+                print(f"  - {difficulty}: {count} questions ({percentage:.1f}%)")
+                
+            print("\nValidation results:")
+            validation_rate = (valid_queries / len(all_questions)) * 100 if all_questions else 0
+            print(f"  - Valid queries: {valid_queries} ({validation_rate:.1f}%)")
+            print(f"  - Invalid queries: {invalid_queries}")
+                
+            print(f"\nJSON file saved successfully at: {output_file}")
+            print(f"Summary saved at: {summary_file}")
         else:
             print("Warning: No questions were generated. The output file will be empty.")
             # Create an empty file for debugging purposes
-            output_file = os.path.join(output_dir, f"{llm_choice}_generated_sample.json")
+            output_file = os.path.join(output_dir, f"{llm_choice}_generated_sample3.json")
             with open(output_file, "w") as f:
                 json.dump([], f)
             print(f"Empty JSON file created at: {output_file}")
@@ -236,6 +409,12 @@ def parse_args():
                         help='Number of samples to generate per database (default: 25)')
     parser.add_argument('--output', type=str, default='./sample',
                         help='Output directory path (default: ./sample)')
+    parser.add_argument('--balanced', action='store_true',
+                        help='Ensure a balanced distribution of question types and difficulty levels')
+    parser.add_argument('--types', type=str, default='all',
+                        help='Comma-separated list of question types to generate (default: all). Options: exact,aggregation,comparison,ranking,reasoning,multi-table,nested')
+    parser.add_argument('--difficulties', type=str, default='all',
+                        help='Comma-separated list of difficulty levels to generate (default: all). Options: simple,moderate,challenge')
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -245,8 +424,48 @@ if __name__ == "__main__":
     if not os.path.isabs(args.output):
         args.output = os.path.abspath(os.path.join(CURRENT_DIR, args.output))
     
+    # Parse question types
+    if args.types.lower() == 'all':
+        selected_types = ["exact", "aggregation", "comparison", "ranking", "reasoning", "multi-table", "nested"]
+    else:
+        selected_types = [t.strip() for t in args.types.split(',')]
+        # Validate selected types
+        valid_types = ["exact", "aggregation", "comparison", "ranking", "reasoning", "multi-table", "nested"]
+        for t in selected_types:
+            if t not in valid_types:
+                print(f"Warning: Invalid question type '{t}'. Will be ignored.")
+                selected_types.remove(t)
+    
+    # Parse difficulty levels
+    if args.difficulties.lower() == 'all':
+        selected_difficulties = ["simple", "moderate", "challenge"]
+    else:
+        selected_difficulties = [d.strip() for d in args.difficulties.split(',')]
+        # Validate difficulty levels
+        valid_difficulties = ["simple", "moderate", "challenge"]
+        for d in selected_difficulties:
+            if d not in valid_difficulties:
+                print(f"Warning: Invalid difficulty level '{d}'. Will be ignored.")
+                selected_difficulties.remove(d)
+    
     print(f"Generating samples using {args.llm.upper()}")
     print(f"Number of samples per database: {args.samples}")
     print(f"Output directory: {args.output}")
+    print(f"Balanced distribution: {args.balanced}")
+    print(f"Question types: {', '.join(selected_types)}")
+    print(f"Difficulty levels: {', '.join(selected_difficulties)}")
+    
+    # Include filter criteria in the output filename
+    filename_suffix = ""
+    if args.types != 'all':
+        filename_suffix += f"_{'-'.join(selected_types)}"
+    if args.difficulties != 'all':
+        filename_suffix += f"_{'-'.join(selected_difficulties)}"
+    if args.balanced:
+        filename_suffix += "_balanced"
+    
+    # Update output directory to include the selection criteria
+    if filename_suffix:
+        args.output = os.path.join(args.output, f"{args.llm}{filename_suffix}")
     
     generate_sample(args.llm, args.samples, args.output)

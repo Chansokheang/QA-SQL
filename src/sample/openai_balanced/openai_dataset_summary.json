@@ -1,0 +1,23 @@
+{
+    "total_questions": 107,
+    "databases_covered": 11,
+    "question_types": {
+        "aggregation": 31,
+        "ranking": 28,
+        "exact": 14,
+        "multi-table": 14,
+        "comparison": 8,
+        "nested": 5,
+        "reasoning": 7
+    },
+    "difficulty_levels": {
+        "simple": 36,
+        "moderate": 41,
+        "challenge": 30
+    },
+    "validation_results": {
+        "valid_queries": 107,
+        "invalid_queries": 0,
+        "validation_rate": 100.0
+    }
+}

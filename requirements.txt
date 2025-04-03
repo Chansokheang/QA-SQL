@@ -32,3 +32,9 @@ multiprocessing>=0.70.15
 # Vector Database
 hnswlib>=0.7.0
 mmh3>=4.0.0
+
+# Enhanced Retrieval
+sentence-transformers>=2.2.2
+datasets>=2.15.0
+accelerate>=0.25.0
+wandb>=0.16.0

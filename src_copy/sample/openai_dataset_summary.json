@@ -1,0 +1,18 @@
+{
+    "total_questions": 330,
+    "databases_covered": 11,
+    "question_types": {
+        "aggregation": 109,
+        "ranking": 99,
+        "exact": 53,
+        "multi-table": 41,
+        "reasoning": 10,
+        "comparison": 11,
+        "nested": 7
+    },
+    "difficulty_levels": {
+        "simple": 111,
+        "moderate": 125,
+        "challenge": 94
+    }
+}

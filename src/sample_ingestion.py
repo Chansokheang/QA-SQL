@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if not persistent_dir:
         DATABASE_DIR = os.path.join(CURRENT_DIR, "..", "database")
         CHROMA_DIR = os.path.join(DATABASE_DIR, "chroma")
-        persistent_dir = os.path.join(CHROMA_DIR, "chroma_db")
+        persistent_dir = os.path.join(CHROMA_DIR, "chroma_db0204")
         print(f"Using default persistent directory: {persistent_dir}")
     
     # Create directories if they don't exist
