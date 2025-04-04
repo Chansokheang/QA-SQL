@@ -1,0 +1,22 @@
+{
+    "0": "SELECT MAX(\"Percent (%) Eligible Free (K-12)\") \nFROM frpm \nWHERE \"County Name\" = 'Alameda';",
+    "1": "SELECT \"Percent (%) Eligible Free (Ages 5-17)\"\nFROM frpm\nWHERE \"School Type\" = 'Continuation Schools'\nORDER BY \"Percent (%) Eligible Free (Ages 5-17)\" ASC\nLIMIT 3;",
+    "2": "SELECT \"Zip\" \nFROM schools \nWHERE \"Charter\" = 1 AND \"District\" = 'Fresno County Office of Education';",
+    "3": "SELECT s.\"MailStreet\"\nFROM frpm f\nJOIN schools s ON f.\"CDSCode\" = s.\"CDSCode\"\nORDER BY f.\"FRPM Count (K-12)\" DESC\nLIMIT 1;",
+    "4": "SELECT \"Phone\" \nFROM schools \nWHERE \"FundingType\" = 'Directly funded' \nAND \"OpenDate\" > '2000-01-01';",
+    "5": "SELECT COUNT(s.\"CDSCode\") \nFROM satscores ss\nJOIN schools s ON ss.cds = s.\"CDSCode\"\nWHERE ss.\"AvgScrMath\" > 400 AND s.\"Virtual\" = 'Y';",
+    "6": "SELECT s.\"School\"\nFROM satscores ss\nJOIN schools s ON ss.cds = s.\"CDSCode\"\nWHERE ss.\"NumTstTakr\" > 500 AND s.\"Magnet\" = 1;",
+    "7": "SELECT s.\"Phone\"\nFROM satscores ss\nJOIN schools s ON ss.cds = s.\"CDSCode\"\nWHERE ss.\"NumGE1500\" = (\n    SELECT MAX(\"NumGE1500\")\n    FROM satscores\n    WHERE \"NumGE1500\" > 0\n)",
+    "8": "SELECT \"NumTstTakr\"\nFROM satscores\nWHERE cds = (\n    SELECT \"CDSCode\"\n    FROM frpm\n    ORDER BY \"FRPM Count (K-12)\" DESC\n    LIMIT 1\n)",
+    "9": "SELECT COUNT(*)\nFROM satscores\nJOIN frpm ON satscores.cds = frpm.\"CDSCode\"\nWHERE satscores.\"AvgScrMath\" > 560 AND frpm.\"Charter Funding Type\" = 'Directly funded';",
+    "10": "SELECT f.\"FRPM Count (Ages 5-17)\"\nFROM frpm f\nJOIN satscores s ON f.\"CDSCode\" = s.cds\nWHERE s.\"AvgScrRead\" = (SELECT MAX(\"AvgScrRead\") FROM satscores)",
+    "11": "SELECT \"CDSCode\" FROM frpm WHERE \"Enrollment (K-12)\" > 500;",
+    "12": "SELECT MAX(\"Percent (%) Eligible Free (Ages 5-17)\") \nFROM frpm \nWHERE \"CDSCode\" IN (\n    SELECT cds \n    FROM satscores \n    WHERE \"NumGE1500\" / \"NumTstTakr\" > 0.3\n)",
+    "13": "SELECT s.\"Phone\"\nFROM schools s\nJOIN satscores ss ON s.\"CDSCode\" = ss.cds\nORDER BY ss.\"NumGE1500\" DESC\nLIMIT 3;",
+    "14": "SELECT s.\"NCESSchool\", f.\"School Name\", f.\"Enrollment (Ages 5-17)\"\nFROM frpm f\nJOIN schools s ON f.\"CDSCode\" = s.\"CDSCode\"\nORDER BY f.\"Enrollment (Ages 5-17)\" DESC\nLIMIT 5;",
+    "15": "SELECT \"dname\", AVG(\"AvgScrRead\") AS avg_reading_score\nFROM satscores\nJOIN schools ON satscores.cds = schools.\"CDSCode\"\nWHERE schools.\"StatusType\" = 'Active'\nGROUP BY \"dname\"\nORDER BY avg_reading_score DESC\nLIMIT 1;",
+    "16": "SELECT COUNT(\"cds\") \nFROM \"satscores\" \nWHERE \"NumTstTakr\" < 100 AND \"cname\" = 'Alameda';",
+    "17": "SELECT sname, \"AvgScrWrite\", schools.\"CharterNum\"\nFROM satscores\nJOIN schools ON satscores.cds = schools.\"CDSCode\"\nWHERE \"AvgScrWrite\" > 499\nORDER BY \"AvgScrWrite\" DESC;",
+    "18": "SELECT COUNT(s.\"CDSCode\") \nFROM schools s\nJOIN satscores ss ON s.\"CDSCode\" = ss.cds\nWHERE s.County = 'Fresno' \nAND s.FundingType = 'Directly funded' \nAND ss.\"NumTstTakr\" <= 250;",
+    "19": "SELECT s.\"Phone\"\nFROM satscores ss\nJOIN schools s ON ss.cds = s.\"CDSCode\"\nORDER BY ss.\"AvgScrMath\" DESC\nLIMIT 1;"
+}

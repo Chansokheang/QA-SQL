@@ -22,7 +22,7 @@ CHROMA_DIR = os.path.join(DATABASE_DIR, "chroma")
 # Allow override of persistent directory via environment variable
 PERSISTENT_DIR = os.environ.get(
     "RAG2SQL_PERSISTENT_DIR", 
-    os.path.join(CHROMA_DIR, "unify_chroma3")
+    os.path.join(CHROMA_DIR, "chroma_db")
 )
 
 # Get LLM choice from environment variable or default to groq
@@ -49,22 +49,19 @@ if USE_HYDE:
     # Use HyDE-based retriever
     retriever = get_hyde_retriever(vector_store, LLM_CHOICE)
 else:
-    # Use standard retriever
-    retriever = vector_store.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={"k": 5, "score_threshold": 0.3},
-    )
+    # Use standard retriever with reranking
+    from src.hyde import get_reranked_retriever
+    retriever = get_reranked_retriever(vector_store)
 
 chain = (
     RunnableParallel(
         branches = {
             "schema_retriever" : RunnableLambda(lambda x: get_relevant_schemas(x['question'], x['db_name'])),
-            "context_retriever" : lambda x: retriever(x['question']) if USE_HYDE else retriever.invoke(x['question']),
+            "context_retriever" : lambda x: retriever(x['question']),
             "input" : lambda x: x['question'],
             "llm_choice" : lambda x: LLM_CHOICE  # Pass the LLM choice to generate_sql
         }
-    )
-    | RunnableLambda (
+    ) | RunnableLambda (
         lambda x: generate_sql(
             x['branches']['context_retriever'],
             x['branches']['schema_retriever'],

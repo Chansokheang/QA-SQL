@@ -1,22 +1,22 @@
 {
-    "total_questions": 53,
+    "total_questions": 274,
     "databases_covered": 11,
     "question_types": {
-        "aggregation": 15,
-        "reasoning": 8,
-        "multi-table": 6,
-        "nested": 4,
-        "exact": 7,
-        "ranking": 9,
-        "comparison": 4
+        "aggregation": 105,
+        "ranking": 79,
+        "multi-table": 31,
+        "exact": 37,
+        "comparison": 16,
+        "reasoning": 4,
+        "nested": 2
     },
     "difficulty_levels": {
-        "moderate": 21,
-        "challenge": 18,
-        "simple": 14
+        "simple": 101,
+        "moderate": 112,
+        "challenge": 61
     },
     "validation_results": {
-        "valid_queries": 53,
+        "valid_queries": 274,
         "invalid_queries": 0,
         "validation_rate": 100.0
     }

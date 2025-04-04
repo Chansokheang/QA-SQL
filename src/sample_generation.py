@@ -10,6 +10,88 @@ from langchain_groq import ChatGroq
 from utils import groq_extract_content, claude_extract_content, ollama_extract_content, openai_extract_content, create_persistent_db, extract_evidence
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
+from openai import OpenAI
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+# def is_sql_correct(schema: str, question: str, sql: str, llm_choice="openai") -> bool:
+#     """
+#     Check if the generated SQL query accurately answers the question based on the schema.
+#
+#     Args:
+#         schema: Database schema information
+#         question: User's question
+#         sql: Generated SQL query
+#         llm_choice: The LLM to use for validation
+#
+#     Returns:
+#         bool: True if the SQL is correct, False otherwise
+#     """
+#     validation_prompt = f"""
+#     Database Schema:
+#     {schema}
+#
+#     Question: {question}
+#     Generated SQL: {sql}
+#
+#     Does the Generated SQL query accurately and completely answer the Question based *only* on the provided Database Schema? Answer strictly with YES or NO.
+#     """
+#
+#     messages = [
+#         {
+#             "role": "user",
+#             "content": validation_prompt
+#         }
+#     ]
+#
+#     try:
+#         client = OpenAI()
+#         if llm_choice == "openai":
+#             response = client.chat.completions.create(
+#                 model="gpt-4o",
+#                 messages=messages,
+#                 max_tokens=1024,
+#                 temperature=0
+#             )
+#             answer = response.choices[0].message.content.strip().upper()
+#         elif llm_choice == "claude":
+#             client = anthropic.Anthropic()
+#             response = client.messages.create(
+#                 model="claude-3-7-sonnet-20250219",
+#                 temperature=0,
+#                 max_tokens=1000,
+#                 messages=messages
+#             )
+#             answer = response.content[0].text.strip().upper()
+#         elif llm_choice == "groq":
+#             llm = ChatGroq(
+#                 model="Llama-3.3-70b-Versatile",
+#                 temperature=0.0,
+#                 groq_api_key=os.environ.get("GROQ_API_KEY")
+#             )
+#             response = llm.invoke(messages)
+#             if hasattr(response, "content"):
+#                 answer = response.content.strip().upper()
+#             else:
+#                 logging.error("LLM response does not contain a valid 'content' attribute.")
+#                 return False  # Default to invalid if validation fails
+#         else:
+#             logging.error(f"Unsupported LLM choice: {llm_choice}")
+#             return False  # Default to invalid if LLM choice is invalid
+#
+#         return "YES" in answer
+#
+#     except Exception as e:
+#         logging.error(f"Error during SQL validation: {e}")
+#         return False  # Default to invalid if any error occurs
+
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
 
 # Constants
 DB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../database/dev_folder/dev_databases"))
@@ -93,7 +175,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
         
         # Ensure DB_DIR is a directory
         if not os.path.isdir(DB_DIR):
-            raise NotADirectoryError(f"DB_DIR is not a directory: {DB_DIR}")
+            raise NotADirectoryError(f"DB_DIR is not a directory: {DEV_FOLDER_DIR}")
 
         # List the contents if the directory exists
         db_list = os.listdir(DB_DIR)
@@ -142,7 +224,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
                 - Create a variety of question types:
                     - **Exact**: Direct retrieval of specific values
                     - **Aggregation**: Using functions like COUNT, AVG, SUM, MIN, MAX
-                    - **Comparison**: Comparing values using conditions
+                    - **Comparison**: Using values under conditions
                     - **Ranking**: Using ORDER BY with LIMIT to get top/bottom results
                     - **Reasoning**: Questions requiring logical reasoning with joins or complex conditions
                     - **Multi-table**: Questions requiring joins across multiple tables
@@ -150,7 +232,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
                 - For each type, create questions with varying difficulties from simple to challenging
                 - Ensure the output is in JSON format with the following fields:
                     - `question_id`: A unique numeric ID for each question.
-                    - `db_id`: The name of the database (e.g., "{db_name}").
+                    - `db_id`: The name of the database (e.g., "{{db_name}}").
                     - `question`: The question in natural language.
                     - `evidence`: Use the provided evidence to justify the SQL query.
                     - `SQL`: A valid SQL query based on the schema and evidence and wrap table name like `order`, `bond`,... .
@@ -161,7 +243,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
                 [
                     {{
                         "question_id": 0,
-                        "db_id": "{db_name}",
+                        "db_id": "{{db_name}}",
                         "question": "What is the total amount of money transferred from account 1 to account 2?",
                         "evidence": "Transferred amount = SUM(`amount`) WHERE `account_id` = 1 AND `account_to` = 2",
                         "SQL": "SELECT SUM(amount) FROM transactions WHERE account_id = 1 AND account_to = 2;",
@@ -170,7 +252,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
                     }},
                     {{
                         "question_id": 1,
-                        "db_id": "{db_name}",
+                        "db_id": "{{db_name}}",
                         "question": "Which customer has made the most transactions, and how many did they make?",
                         "evidence": "Customer transactions can be counted using COUNT(*) GROUP BY customer_id",
                         "SQL": "SELECT c.name, COUNT(*) as transaction_count FROM transactions t JOIN customers c ON t.customer_id = c.id GROUP BY t.customer_id ORDER BY transaction_count DESC LIMIT 1;",
@@ -284,7 +366,16 @@ def generate_sample(llm_choice, num_sample, output_dir):
                         question["question_id"] = question_id_counter
                         question_id_counter += 1
                         all_questions.append(question)
-                        
+
+                        # # Semantic Validation
+                        # if is_sql_correct(schemas, question["question"], sql_query, llm_choice):
+                        #     print("✅ Semantic validation passed.")
+                        #     question["semantic_valid"] = True
+                        # else:
+                        #     print("❌ Semantic validation failed.")
+                        #     question["semantic_valid"] = False
+                        #     # Skip adding invalid queries to all_questions
+                            
                     except sqlite3.Error as e:
                         print(f"❌ SQL validation error for question {question.get('question', '')[:50]}: {e}")
                         question["is_valid"] = False
@@ -381,7 +472,7 @@ def generate_sample(llm_choice, num_sample, output_dir):
             for difficulty, count in overall_difficulty_counts.items():
                 percentage = (count / len(all_questions)) * 100
                 print(f"  - {difficulty}: {count} questions ({percentage:.1f}%)")
-                
+            
             print("\nValidation results:")
             validation_rate = (valid_queries / len(all_questions)) * 100 if all_questions else 0
             print(f"  - Valid queries: {valid_queries} ({validation_rate:.1f}%)")
@@ -434,7 +525,7 @@ if __name__ == "__main__":
         for t in selected_types:
             if t not in valid_types:
                 print(f"Warning: Invalid question type '{t}'. Will be ignored.")
-                selected_types.remove(t)
+                selected_types.remove(d)
     
     # Parse difficulty levels
     if args.difficulties.lower() == 'all':

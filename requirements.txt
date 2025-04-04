@@ -6,6 +6,7 @@ langchain-community>=0.0.1
 langchain-chroma>=0.0.1
 langchain-openai>=0.0.1
 langchain-groq>=0.0.1
+langchain-cohere>=0.1.0 # Added for reranking
 chromadb==0.6.3
 chroma-hnswlib==0.7.6
 

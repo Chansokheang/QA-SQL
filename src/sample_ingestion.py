@@ -10,9 +10,10 @@ def ingest_dataset(dataset_path, persistent_dir):
 
     loader = JSONLoader(
         file_path=dataset_path,
-        jq_schema='.[] | {page_content: .question, metadata: {query: .SQL}}',
-        text_content=False
-    )
+        # Combine question and SQL into page_content for embedding
+         jq_schema='.[] | {page_content: ("Question: " + .question + "\nSQL: " + .SQL), metadata: {db_id: .db_id, difficulty: .difficulty, question_type: .question_type}}', # Keep other relevant info in metadata
+         text_content=False
+     )
 
     documents = loader.load()
 
@@ -38,14 +39,14 @@ if __name__ == "__main__":
     
     dataset_path = args.dataset
     if not dataset_path:
-        dataset_path = os.path.join(CURRENT_DIR, "sample", "Groq_generated_sample.json")
+        dataset_path = os.path.join(CURRENT_DIR, "sample", "openai_generated_sample3.json")
         print(f"Using default dataset path: {dataset_path}")
     
     persistent_dir = args.persistent_dir
     if not persistent_dir:
         DATABASE_DIR = os.path.join(CURRENT_DIR, "..", "database")
         CHROMA_DIR = os.path.join(DATABASE_DIR, "chroma")
-        persistent_dir = os.path.join(CHROMA_DIR, "chroma_db0204")
+        persistent_dir = os.path.join(CHROMA_DIR, "chroma_db0304")
         print(f"Using default persistent directory: {persistent_dir}")
     
     # Create directories if they don't exist

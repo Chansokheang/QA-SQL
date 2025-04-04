@@ -27,7 +27,7 @@ if __name__ == '__main__':
     parser.add_argument("--persistent_dir", type=str, 
                         help="Directory where the Chroma DB is stored",
                         default=os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                                           "database", "chroma", "unify_chroma3"))
+                                           "database", "chroma", "chroma_db"))
     parser.add_argument("--output_dir", type=str, 
                         help="Directory to save output files",
                         default="./outputs")
@@ -47,13 +47,13 @@ if __name__ == '__main__':
     parser.add_argument("--append", action="store_true",
                         help="Append to existing output file instead of creating a new one")
     args = parser.parse_args()
-    
+     
     # Ensure output directory exists
     os.makedirs(args.output_dir, exist_ok=True)
     
     # Define output filename based on LLM choice and hyde usage
     hyde_suffix = "" if not args.no_hyde else "_no_hyde"
-    output_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}4.json")
+    output_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}_0404_no_hyde_chroma.json")
     
     # Load dataset
     print(f"Loading dataset from {args.input}")
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # Always generate BIRD format for all processed entries so far
     try:
         # Convert ALL processed results to BIRD format
-        bird_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}_bird4.json")
+        bird_file = os.path.join(args.output_dir, f"{args.llm}{hyde_suffix}_bird_0404_no_hyde_chroma.json")
         
         # First, load existing BIRD format results if appending
         existing_bird_results = {}

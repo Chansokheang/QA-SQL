@@ -7,6 +7,9 @@ from langchain_groq import ChatGroq
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import ChatPromptTemplate
+from langchain_cohere import CohereRerank
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.schema import Document # Needed for type hinting
 
 from src.utils import extract_sql
 
@@ -24,7 +27,7 @@ CHROMA_DIR = os.path.join(DATABASE_DIR, "chroma")
 # Allow override of persistent directory via environment variable
 PERSISTENT_DIR = os.environ.get(
     "RAG2SQL_PERSISTENT_DIR", 
-    os.path.join(CHROMA_DIR, "chroma_db")
+    os.path.join(CHROMA_DIR, "chroma_db0304")
 )
 
 # Get LLM choice from environment variable or default to groq
@@ -104,29 +107,129 @@ def generate_hypothetical_document(question, llm_choice="openai"):
         # Return a simple default in case of error
         return f"SQL query for {question}"
 
-def get_hyde_retriever(vector_store, llm_choice="openai"):
+
+def get_hyde_retriever(vector_store, llm_choice="openai", top_n=5):
     """
-    Create a retriever that uses HyDE (Hypothetical Document Embeddings) approach.
-    
+    Create a retriever that uses a hybrid HyDE approach followed by Cohere Rerank.
+    Retrieves based on both the hypothetical document and the original question,
+    then reranks the combined results using Cohere Rerank.
+
     Args:
-        vector_store: The vector store to retrieve documents from
-        llm_choice: The LLM to use for generating hypothetical documents
-    
+        vector_store: The vector store to retrieve documents from.
+        llm_choice: The LLM to use for generating hypothetical documents.
+        top_n (int): The final number of documents to return after reranking.
+
     Returns:
-        callable: A function that takes a question and returns retrieved documents
+        callable: A function that takes a question and returns reranked documents.
     """
+    # Base retriever for initial similarity search
     base_retriever = vector_store.as_retriever(
         search_type="similarity_score_threshold",
-        search_kwargs={"k": 5, "score_threshold": 0.3},
+        # Retrieve more initially to give the reranker more options
+        search_kwargs={"k": 10, "score_threshold": 0.2}, 
     )
-    
-    def hyde_retrieve(question):
-        # Generate hypothetical document
+
+    # Reranker setup (assumes COHERE_API_KEY is in environment)
+    try:
+        compressor = CohereRerank(top_n=top_n)
+        logging.info("Cohere Rerank compressor initialized.")
+        use_reranker = True
+    except Exception as e:
+        logging.error(f"Failed to initialize Cohere Rerank. Ensure COHERE_API_KEY is set. Falling back to base retriever without reranking. Error: {e}")
+        # Fallback: Don't use the reranker if initialization fails
+        use_reranker = False
+        compressor = None # Ensure compressor is None if not used
+
+    def hyde_hybrid_rerank_retrieve(question: str) -> list[Document]:
+        # 1. Retrieve based on the original question
+        logging.info(f"Retrieving based on original question: {question[:100]}...")
+        original_results = base_retriever.invoke(question)
+        logging.info(f"Found {len(original_results)} results based on original question.")
+
+        # 2. Generate hypothetical document and retrieve based on it
         hypothetical_doc = generate_hypothetical_document(question, llm_choice)
         logging.info(f"Generated hypothetical document: {hypothetical_doc[:100]}...")
-        
-        # Use hypothetical document for retrieval instead of original question
-        return base_retriever.invoke(hypothetical_doc)
-    
-    return hyde_retrieve
+        hyde_results = base_retriever.invoke(hypothetical_doc)
+        logging.info(f"Found {len(hyde_results)} results based on hypothetical document.")
 
+        # 3. Combine and deduplicate results
+        combined_results_dict = {doc.page_content: doc for doc in original_results}
+        for doc in hyde_results:
+            if doc.page_content not in combined_results_dict:
+                combined_results_dict[doc.page_content] = doc
+        
+        initial_combined_results = list(combined_results_dict.values())
+        logging.info(f"Combined and deduplicated initial results: {len(initial_combined_results)} documents.")
+
+        if not initial_combined_results:
+             return [] # Return empty list if no initial results
+
+        # 4. Rerank the combined results using the original question IF reranker is available
+        if use_reranker and compressor:
+            logging.info(f"Reranking {len(initial_combined_results)} documents with Cohere Rerank...")
+            reranked_docs = compressor.compress_documents(
+                documents=initial_combined_results, 
+                query=question
+            )
+            logging.info(f"Reranked results: {len(reranked_docs)} documents.")
+            return reranked_docs
+        else:
+            # Fallback: Return the combined results without reranking, potentially truncated
+            logging.warning("Cohere Reranker not available or failed. Returning top results from initial retrieval.")
+            # Return top_n results based on initial retrieval (no specific order guaranteed here without scores)
+            return initial_combined_results[:top_n] 
+
+    return hyde_hybrid_rerank_retrieve
+
+def get_reranked_retriever(vector_store, top_n=5):
+    """
+    Create a retriever that uses Cohere Rerank on the standard retriever.
+
+    Args:
+        vector_store: The vector store to retrieve documents from.
+        top_n (int): The final number of documents to return after reranking.
+
+    Returns:
+        callable: A function that takes a question and returns reranked documents.
+    """
+    # Base retriever for initial similarity search
+    base_retriever = vector_store.as_retriever(
+        search_type="similarity_score_threshold",
+        search_kwargs={"k": 10, "score_threshold": 0.3},
+    )
+
+    # Reranker setup (assumes COHERE_API_KEY is in environment)
+    try:
+        compressor = CohereRerank(top_n=top_n)
+        logging.info("Cohere Rerank compressor initialized.")
+        use_reranker = True
+    except Exception as e:
+        logging.error(f"Failed to initialize Cohere Rerank. Ensure COHERE_API_KEY is set. Falling back to base retriever without reranking. Error: {e}")
+        # Fallback: Don't use the reranker if initialization fails
+        use_reranker = False
+        compressor = None  # Ensure compressor is None if not used
+
+    def rerank_retrieve(question: str) -> list[Document]:
+        # 1. Retrieve based on the original question
+        logging.info(f"Retrieving based on original question: {question[:100]}...")
+        initial_results = base_retriever.invoke(question)
+        logging.info(f"Found {len(initial_results)} results based on original question.")
+
+        if not initial_results:
+            return []  # Return empty list if no initial results
+
+        # 2. Rerank the initial results using the original question IF reranker is available
+        if use_reranker and compressor:
+            logging.info(f"Reranking {len(initial_results)} documents with Cohere Rerank...")
+            reranked_docs = compressor.compress_documents(
+                documents=initial_results,
+                query=question
+            )
+            logging.info(f"Reranked results: {len(reranked_docs)} documents.")
+            return reranked_docs
+        else:
+            # Fallback: Return the initial results without reranking, potentially truncated
+            logging.warning("Cohere Reranker not available or failed. Returning top results from initial retrieval.")
+            return initial_results[:top_n]
+
+    return rerank_retrieve

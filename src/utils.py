@@ -532,40 +532,42 @@ def generate_sql(contextual, schema: str, question: str, llm_choice="groq"):
             else:
                 formatted_context += f"\nEXAMPLE {i+1} (Relevance: {combined_score}):\n{doc.page_content}\n"
     else:
-        # Handle the case when contextual is not a list of Documents
-        formatted_context = str(contextual)
-    
+        # Handle the case when contextual is not a list of Documents or is empty
+        formatted_context = str(contextual) if contextual else "No relevant examples found."
+
     messages = [
         {
-            "role" : "assistant",
+            "role" : "system", # Use system role for overall instructions
             "content" : (
-                f"""
-                    You are an expert SQL generator. Your task is to generate SQL queries based on the provided database schema, contextual information, and the user's question. Use the context and schema carefully to understand the data structure and answer the question accurately with SQL.
+                f"""You are an expert SQL generator. Your task is to generate a single, correct SQL query based on the provided database schema, example Question/SQL pairs, and the user's question.
 
-                    **Relevant Schema**:
-                    {schema}
-            
-                    **Contextual Information**:
-                    {formatted_context}
-            
-                    **IMPORTANT**:
-                        - First, determine if the question matches the context provided or is thematically similar. If it does, generate SQL that leverages this context directly.
-                        - Pay special attention to examples with higher relevance scores.
-                        - Enclose columns with spaces or special characters in double quotes.
-                        - If the question does not match the context, use the schema and context as a guide to understand the data structure and generate SQL that best answers the user's question.
-                        - Only use columns from the schema. Do not introduce columns not listed here.
+                **Relevant Schema**:
+                ```sql
+                {schema}
+                ```
 
+                **Contextual Examples (Question/SQL Pairs)**:
+                {formatted_context}
 
-                    **SQL Code**:
-                    (Provide only the SQL code, without any additional explanations or comments and no additional messages.)
-                """)
+                **Instructions**:
+                1. Carefully analyze the user's question: "{question}"
+                2. Examine the **Relevant Schema** to understand table structures and relationships.
+                3. Review the **Contextual Examples**. Pay close attention to the examples with the highest relevance scores.
+                4. **Adapt the SQL pattern** from the most relevant example(s) to answer the user's specific question using the provided schema. If no relevant examples are found, rely solely on the schema.
+                5. Ensure the generated SQL query accurately addresses all conditions and requirements mentioned in the user's question.
+                6. Only use tables and columns defined in the **Relevant Schema**.
+                7. Enclose table or column names with spaces or special characters in double quotes (e.g., "Order Details").
+                8. Output **only** the final SQL query within ```sql ... ``` tags. Do not include any other text, explanations, or comments before or after the SQL block.
+                """
+            )
         },
         {
             "role" : "user",
-            "content" : (f"Generate a SQL query for: {question}")
+            "content" : f"Generate the SQL query for the question: \"{question}\""
         }
     ]
-    
+
+    logging.debug(f"Prompt sent to {llm_choice} LLM:\nSystem: {messages[0]['content']}\nUser: {messages[1]['content']}") # Log the prompt
     print(f"Generating SQL using {llm_choice} LLM...")
     
     if llm_choice == "openai":
